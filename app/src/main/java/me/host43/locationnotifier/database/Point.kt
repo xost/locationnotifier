@@ -7,15 +7,15 @@ import androidx.room.PrimaryKey
 @Entity(tableName="points_table")
 data class Point(
     @PrimaryKey(autoGenerate = true)
-    var pointId: Long,
+    var pointId: Long = 0L,
     @ColumnInfo(name="name")
-    val name: String,
+    var name: String = "",
     @ColumnInfo(name="altitude")
-    val altitude: Double,
+    var altitude: Double = 0.0,
     @ColumnInfo(name="latitude")
-    val latitude: Double,
+    var latitude: Double = 0.0,
     @ColumnInfo(name="distance")
-    val distance: Double,
+    var distance: Double = 0.0,
     @ColumnInfo(name="enabled")
-    var enabled: Boolean
+    var enabled: Boolean = false
 )

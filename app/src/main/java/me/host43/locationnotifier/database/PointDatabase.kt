@@ -6,22 +6,24 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [Point::class], version = 1, exportSchema = false)
-abstract class PointDatabase: RoomDatabase() {
+abstract class PointDatabase : RoomDatabase() {
     abstract val dao: PointDatabaseDao
-    companion object{
+
+    companion object {
         @Volatile
         private var INSTANCE: PointDatabase? = null
         fun getInstance(context: Context): PointDatabase {
-            synchronized(this){
+            synchronized(this) {
                 var instance = INSTANCE
-                if (instance==null){
+                if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         PointDatabase::class.java,
-                        "location_points_database")
+                        "track_points_database"
+                    )
                         .fallbackToDestructiveMigration()
                         .build()
-                    INSTANCE=instance
+                    INSTANCE = instance
                 }
                 return instance
             }

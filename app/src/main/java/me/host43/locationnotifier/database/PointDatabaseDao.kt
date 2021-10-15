@@ -9,10 +9,10 @@ interface PointDatabaseDao {
     suspend fun insert(point: Point)
     @Update
     suspend fun update(point: Point)
-    @Delete
-    suspend fun delete(key: Long)
+    @Query("DELETE FROM points_table")
+    suspend fun clear()
     @Query("SELECT * FROM points_table ORDER BY pointId ASC")
     fun getAllPoints(): LiveData<List<Point>>
-    @Query("SELECT * FROM points_table WHERE pointId=:key")
-    suspend fun get(key: Long): Point?
+    @Query("SELECT * FROM points_table WHERE pointId = :key")
+    suspend fun get(key: Long): Point
 }
