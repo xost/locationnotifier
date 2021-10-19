@@ -37,14 +37,14 @@ class InputPointFragment : Fragment() {
         b.lifecycleOwner = this
         b.vm = vm
 
-        vm.eventAddPointDone.observe(viewLifecycleOwner, Observer {
+        vm.navigateToTrackPoints.observe(viewLifecycleOwner, Observer {
             if (it) {
                 Log.i("##$#","#####################")
                 this.findNavController().navigate(
                     InputPointFragmentDirections.actionInputPointFragmentToTrackPointsFragment()
                 )
+                vm.navigateToTrackPointsDone()
             }
-            vm.addPointComplete()
         })
 
         return b.root

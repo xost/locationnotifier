@@ -12,13 +12,9 @@ import me.host43.locationnotifier.database.PointDatabaseDao
 
 class InputPointViewModel(val db: PointDatabaseDao, app: Application) : AndroidViewModel(app) {
 
-    private val _eventAddPoint = MutableLiveData<Boolean>()
-    val eventAddPoint: LiveData<Boolean>
-        get() = _eventAddPoint
-
-    private val _eventAddPointDone = MutableLiveData<Boolean>()
-    val eventAddPointDone: LiveData<Boolean>
-        get() = _eventAddPointDone
+    private val _navigateToTrackPoints = MutableLiveData<Boolean>()
+    val navigateToTrackPoints: LiveData<Boolean>
+        get() = _navigateToTrackPoints
 
     var pointName = "First point"
     var altitude = 0.0
@@ -36,11 +32,11 @@ class InputPointViewModel(val db: PointDatabaseDao, app: Application) : AndroidV
             point.enabled = enabled
             db.insert(point)
             Log.i("InputPoint","add point complete")
-            _eventAddPointDone.value=true
+            _navigateToTrackPoints.value=true
         }
     }
 
-    fun addPointComplete() {
-        _eventAddPointDone.value=false
+    fun navigateToTrackPointsDone() {
+        _navigateToTrackPoints.value=false
     }
 }
