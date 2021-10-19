@@ -1,9 +1,12 @@
 package me.host43.locationnotifier.trackpoints
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import me.host43.locationnotifier.database.PointDatabaseDao
 
 class TrackPointsViewModel(val db: PointDatabaseDao, app: Application) : AndroidViewModel(app) {
@@ -16,11 +19,21 @@ class TrackPointsViewModel(val db: PointDatabaseDao, app: Application) : Android
     val eventAddPointDone: LiveData<Boolean>
         get() = _eventAddPointDone
 
-    fun onAddButton(){
-        _eventAddPoint.value=true
+
+    var points = db.getAllPoints()
+
+    fun onAddButton() {
+        _eventAddPoint.value = true
     }
 
-    fun navigationComplete(){
-        _eventAddPoint.value=false
+    fun navigationComplete() {
+        _eventAddPoint.value = false
+    }
+
+    fun clearAll(){
+        Log.i("cleanAll","on Clean all listener")
+        viewModelScope.launch{
+            db.clear()
+        }
     }
 }

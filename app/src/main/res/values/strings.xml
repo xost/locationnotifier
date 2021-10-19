@@ -15,5 +15,7 @@
     <string name="name_label_text">Name:</string>
     <string name="addPointHint">add point</string>
     <string name="add_point_hint">add poont</string>
+    <string name="clean_button">Clean all</string>
+    <string name="clear_button">remove all</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

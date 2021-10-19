@@ -35,6 +35,9 @@ class TrackPointsFragment : Fragment() {
         b.lifecycleOwner = this
         b.vm = vm
 
+        val adapter = PointAdapter()
+        b.pointList.adapter = adapter
+
         vm.eventAddPoint.observe(viewLifecycleOwner, Observer {
             if (it) {
                 this.findNavController().navigate(
@@ -44,6 +47,11 @@ class TrackPointsFragment : Fragment() {
             }
         })
 
+        vm.points.observe(viewLifecycleOwner, Observer {
+            it?.let{
+                adapter.submitList(it)
+            }
+        })
         return b.root
     }
 }
