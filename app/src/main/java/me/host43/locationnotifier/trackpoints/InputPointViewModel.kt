@@ -1,7 +1,10 @@
 package me.host43.locationnotifier.trackpoints
 
 import android.app.Application
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import androidx.databinding.Bindable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,27 +19,44 @@ class InputPointViewModel(val db: PointDatabaseDao, app: Application) : AndroidV
     val navigateToTrackPoints: LiveData<Boolean>
         get() = _navigateToTrackPoints
 
-    var pointName = "First point"
-    var altitude = 0.0
-    var latitude = 0.0
-    var distance = 0.0
-    var enabled = false
+    private var pointName = "First point"
+    set(value) {
+        field=value
+    }
+    @get:Bindable
+    val pointNameWatcher = object: TextWatcher{
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            pointName=s.toString()
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+        }
+
+    }
+    //var altitude = 0.0
+    //var latitude = 0.0
+    //var distance = 0.0
+    //var enabled = false
+
 
     fun onAddButton() {
         viewModelScope.launch {
             val point = Point()
             point.name = pointName
-            point.altitude = altitude
-            point.latitude = latitude
-            point.distance = distance
-            point.enabled = enabled
+            //point.altitude = altitude
+            //point.latitude = latitude
+            //point.distance = distance
+            //point.enabled = enabled
             db.insert(point)
-            Log.i("InputPoint","add point complete")
-            _navigateToTrackPoints.value=true
+            Log.i("InputPoint", "add point complete")
+            _navigateToTrackPoints.value = true
         }
     }
 
     fun navigateToTrackPointsDone() {
-        _navigateToTrackPoints.value=false
+        _navigateToTrackPoints.value = false
     }
 }

@@ -53,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@string/altitude_text"
+            app:altitude="@{point}"
             app:layout_constraintBaseline_toBaselineOf="@+id/altitude_label"
             app:layout_constraintStart_toEndOf="@+id/altitude_label" />
 
@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@string/latitude_text"
+            app:altitude="@{point}"
             app:layout_constraintBaseline_toBaselineOf="@+id/latitude_label"
             app:layout_constraintStart_toEndOf="@+id/latitude_label" />
 
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@string/distance_text"
+            app:distance="@{point}"
             app:layout_constraintBaseline_toBaselineOf="@+id/distance_label"
             app:layout_constraintStart_toEndOf="@+id/distance_label" />
 
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="@string/name_text"
+            app:name="@{point}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/altitude_text_view" />
 

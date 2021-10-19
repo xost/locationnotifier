@@ -1,5 +1,6 @@
 package me.host43.locationnotifier.trackpoints
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ class PointAdapter : ListAdapter<Point,PointAdapter.ViewHolder>(PointsDiffCallba
     class ViewHolder private constructor (private val b: ItemPointLayoutBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(item: Point){
             b.point=item
+            b.executePendingBindings()
         }
         companion object{
             fun from(parent: ViewGroup): ViewHolder{
