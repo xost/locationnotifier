@@ -50,28 +50,28 @@
 
         <TextView
             android:id="@+id/altitude_text_view"
+            android:text="@{point.altitude}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            app:altitude="@{point}"
             app:layout_constraintBaseline_toBaselineOf="@+id/altitude_label"
             app:layout_constraintStart_toEndOf="@+id/altitude_label" />
 
         <TextView
             android:id="@+id/latitude_text_view"
+            android:text="@{point.latitude}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            app:altitude="@{point}"
             app:layout_constraintBaseline_toBaselineOf="@+id/latitude_label"
             app:layout_constraintStart_toEndOf="@+id/latitude_label" />
 
         <TextView
             android:id="@+id/distance_text_view"
+            android:text="@{point.distance}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            app:distance="@{point}"
             app:layout_constraintBaseline_toBaselineOf="@+id/distance_label"
             app:layout_constraintStart_toEndOf="@+id/distance_label" />
 
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            app:name="@{point}"
+            android:text="@{point.name}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/altitude_text_view" />
 

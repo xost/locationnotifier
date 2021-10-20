@@ -25,7 +25,7 @@
 
         <EditText
             android:id="@+id/name_input"
-            android:text ="@={vm.pointName}"
+            android:text="@={vm.p.name}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -41,8 +41,7 @@
 
         <EditText
             android:id="@+id/altitude_input"
-            android:text="@{Double.toString(vm.altitude)}"
-            app:textChanerListener="@{vm.pointParams.altitudeTextWatcher}"
+            android:text="@={vm.p.altitude}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -58,7 +57,7 @@
 
         <EditText
             android:id="@+id/latitude_input"
-            android:text="@{Double.toString(vm.latitude)}"
+            android:text="@={vm.p.latitude}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -74,7 +73,7 @@
 
         <EditText
             android:id="@+id/distance_input"
-            android:text="@{Double.toString(vm.distance)}"
+            android:text="@={vm.p.distance}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -83,7 +82,7 @@
 
         <Button
             android:id="@+id/add_button"
-            android:text="Add"
+            android:text="@string/add_button_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

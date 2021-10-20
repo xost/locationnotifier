@@ -18,30 +18,23 @@ class InputPointViewModel(val db: PointDatabaseDao, app: Application) : AndroidV
     val navigateToTrackPoints: LiveData<Boolean>
         get() = _navigateToTrackPoints
 
-    var pointName = "First point"
-
-    private val altitudeString = MutableLiveData<String>()
-    val altitude:Double = Transformations.map(altitudeString) {
-        altitude=it.toDouble()
-    }
-
-    var latitudeString = "0.0"
-    var distanceString = "0.0"
-    var enabled = false
-
+    val p = newPoint()
 
     fun onAddButton() {
         viewModelScope.launch {
-            val point = Point()
-            point.name = pointName
-            //point.altitude = altitude
-            //point.latitude = latitude
-            //point.distance = distance
-            //point.enabled = enabled
-            db.insert(point)
+            //p.name = p.name
+            //p.altitude = 0.0
+            //p.latitude = 0.0
+            //p.distance = 0.0
+            //p.enabled = true
+            db.insert(p)
             Log.i("InputPoint", "add point complete")
             _navigateToTrackPoints.value = true
         }
+    }
+
+    private fun newPoint(): Point{
+        return Point()
     }
 
     fun navigateToTrackPointsDone() {
