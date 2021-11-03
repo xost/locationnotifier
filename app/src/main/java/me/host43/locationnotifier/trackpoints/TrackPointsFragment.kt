@@ -41,7 +41,8 @@ class TrackPointsFragment : Fragment() {
         vm.eventAddPoint.observe(viewLifecycleOwner, Observer {
             if (it) {
                 this.findNavController().navigate(
-                    TrackPointsFragmentDirections.actionTrackPointsFragmentToInputPointFragment()
+                    //TrackPointsFragmentDirections.actionTrackPointsFragmentToInputPointFragment()
+                    TrackPointsFragmentDirections.actionTrackPointsFragmentToMapFragment()
                 )
                 vm.navigationComplete()
             }

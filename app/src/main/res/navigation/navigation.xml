@@ -12,6 +12,9 @@
         <action
             android:id="@+id/action_trackPointsFragment_to_inputPointFragment"
             app:destination="@id/inputPointFragment" />
+        <action
+            android:id="@+id/action_trackPointsFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
     </fragment>
     <fragment
         android:id="@+id/inputPointFragment"
@@ -22,4 +25,9 @@
             android:id="@+id/action_inputPointFragment_to_trackPointsFragment"
             app:destination="@id/trackPointsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="me.host43.locationnotifier.trackpoints.MapFragment"
+        android:label="MapFragment"
+        tools:layout="@layout/fragment_map"/>
 </navigation>

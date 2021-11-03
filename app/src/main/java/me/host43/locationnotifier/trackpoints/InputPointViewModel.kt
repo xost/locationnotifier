@@ -22,18 +22,13 @@ class InputPointViewModel(val db: PointDatabaseDao, app: Application) : AndroidV
 
     fun onAddButton() {
         viewModelScope.launch {
-            //p.name = p.name
-            //p.altitude = 0.0
-            //p.latitude = 0.0
-            //p.distance = 0.0
-            //p.enabled = true
             db.insert(p)
             Log.i("InputPoint", "add point complete")
             _navigateToTrackPoints.value = true
         }
     }
 
-    private fun newPoint(): Point{
+    private fun newPoint(): Point {
         return Point()
     }
 
