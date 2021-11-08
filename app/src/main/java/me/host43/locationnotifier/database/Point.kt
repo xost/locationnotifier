@@ -20,11 +20,11 @@ class Point {
     @ColumnInfo(name = "name")
     var name: String = ""
 
-    @ColumnInfo(name = "altitude")
-    var altitude: Double = 0.0
-
     @ColumnInfo(name = "latitude")
     var latitude: Double = 0.0
+
+    @ColumnInfo(name = "longitude")
+    var longitude: Double = 0.0
 
     @ColumnInfo(name = "distance")
     var distance: Double = 0.0

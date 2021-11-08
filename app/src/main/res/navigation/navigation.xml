@@ -29,5 +29,9 @@
         android:id="@+id/mapFragment"
         android:name="me.host43.locationnotifier.trackpoints.MapFragment"
         android:label="MapFragment"
-        tools:layout="@layout/fragment_map"/>
+        tools:layout="@layout/fragment_map">
+        <action
+            android:id="@+id/action_mapFragment_to_trackPointsFragment"
+            app:destination="@id/trackPointsFragment" />
+    </fragment>
 </navigation>
