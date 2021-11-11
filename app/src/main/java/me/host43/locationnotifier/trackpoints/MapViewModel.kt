@@ -6,7 +6,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.yandex.mapkit.mapview.MapView
 import kotlinx.coroutines.launch
 import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabaseDao

@@ -6,35 +6,26 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.yandex.mapkit.Animation
-import com.yandex.mapkit.MapKitFactory
-import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.map.*
-import com.yandex.mapkit.map.Map
-import com.yandex.mapkit.mapview.MapView
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
-import me.host43.locationnotifier.database.PointDatabaseDao
 import me.host43.locationnotifier.databinding.FragmentMapBinding
-import me.host43.locationnotifier.databinding.FragmentMapBindingImpl
 
-class MapFragment : Fragment(), InputListener {
+class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var b: FragmentMapBinding
-    private lateinit var mapView: MapView
+    private lateinit var googleMap: GoogleMap
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        MapKitFactory.setApiKey("dd4e461e-e9f8-4af5-a7dd-34e78e874e22")
-        MapKitFactory.initialize(this.context)
-
         b = DataBindingUtil.inflate<FragmentMapBinding>(
             inflater,
             R.layout.fragment_map,
@@ -50,14 +41,6 @@ class MapFragment : Fragment(), InputListener {
         b.lifecycleOwner=this
         b.vm=vm
 
-        mapView = b.mapView
-
-        mapView.map.move(
-            CameraPosition(Point(55.751574, 37.573856), 17.0f, 0.0f, 0.0f),
-            Animation(Animation.Type.SMOOTH, 3.0F), null
-        )
-        mapView.map.addInputListener(this)
-
         vm.navigateToTrackPoints.observe(viewLifecycleOwner, Observer {
             if (it){
                 this.findNavController().navigate(
@@ -67,41 +50,47 @@ class MapFragment : Fragment(), InputListener {
             }
         })
 
+        b.mapView.onCreate(savedInstanceState)
+        b.mapView.onResume()
+        b.mapView.getMapAsync(this)
+
         return b.root
     }
 
-    override fun onMapTap(p0: Map, p1: Point) {
-        Toast.makeText(
-            context,
-            "${p1.latitude.toString()}:${p1.longitude.toString()}",
-            Toast.LENGTH_SHORT
-        ).show()
-        b.vm?.let{
-            it.p.latitude=p1.latitude
-            it.p.longitude=p1.longitude
-            Log.i("SHORT TAP","GPS coordinates should be upgraded")
+    override fun onMapReady(map: GoogleMap){
+        map?.let{
+            googleMap = it
         }
-    }
-
-    override fun onMapLongTap(p0: Map, p1: Point) {
-        Toast.makeText(
-            context,
-            "${p1.latitude.toString()}:${p1.longitude.toString()}",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
-    override fun onStop() {
-        // Вызов onStop нужно передавать инстансам MapView и MapKit.
-        mapView.onStop()
-        MapKitFactory.getInstance().onStop()
-        super.onStop()
+        val geoCoo = LatLng(22.3,33.4)
     }
 
     override fun onStart() {
-        // Вызов onStart нужно передавать инстансам MapView и MapKit.
         super.onStart()
-        MapKitFactory.getInstance().onStart()
-        mapView.onStart()
+        b.mapView.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        b.mapView.onStop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        b.mapView.onResume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        b.mapView.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        b.mapView.onPause()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        b.mapView.onLowMemory()
     }
 }
