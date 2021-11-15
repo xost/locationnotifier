@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/inputPointFragment"
-        android:name="me.host43.locationnotifier.trackpoints.InputPointFragment"
+        android:name="me.host43.locationnotifier.manualinput.InputPointFragment"
         android:label="InputPointFragment"
         tools:layout="@layout/fragment_input_point">
         <action
@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/mapFragment"
-        android:name="me.host43.locationnotifier.trackpoints.MapFragment"
+        android:name="me.host43.locationnotifier.map.MapFragment"
         android:label="MapFragment"
         tools:layout="@layout/fragment_map">
         <action

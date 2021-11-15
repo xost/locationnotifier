@@ -1,4 +1,4 @@
-package me.host43.locationnotifier.trackpoints
+package me.host43.locationnotifier.manualinput
 
 import android.app.Application
 import android.util.Log
@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabaseDao
 
-class MapViewModel(private val db: PointDatabaseDao, app: Application) : AndroidViewModel(app) {
+class InputPointViewModel(val db: PointDatabaseDao, app: Application) : AndroidViewModel(app) {
 
     private val _navigateToTrackPoints = MutableLiveData<Boolean>()
     val navigateToTrackPoints: LiveData<Boolean>
@@ -21,6 +21,7 @@ class MapViewModel(private val db: PointDatabaseDao, app: Application) : Android
     fun onAddButton() {
         viewModelScope.launch {
             db.insert(p)
+            Log.i("InputPoint", "add point complete")
             _navigateToTrackPoints.value = true
         }
     }

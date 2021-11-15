@@ -1,18 +1,15 @@
-package me.host43.locationnotifier.trackpoints
+package me.host43.locationnotifier.map
 
 import android.app.Application
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
-import androidx.databinding.BaseObservable
-import androidx.databinding.Bindable
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import me.host43.locationnotifier.BR
 import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabaseDao
 
-class InputPointViewModel(val db: PointDatabaseDao, app: Application) : AndroidViewModel(app) {
+class MapViewModel(private val db: PointDatabaseDao, app: Application) : AndroidViewModel(app) {
 
     private val _navigateToTrackPoints = MutableLiveData<Boolean>()
     val navigateToTrackPoints: LiveData<Boolean>
@@ -23,7 +20,6 @@ class InputPointViewModel(val db: PointDatabaseDao, app: Application) : AndroidV
     fun onAddButton() {
         viewModelScope.launch {
             db.insert(p)
-            Log.i("InputPoint", "add point complete")
             _navigateToTrackPoints.value = true
         }
     }
