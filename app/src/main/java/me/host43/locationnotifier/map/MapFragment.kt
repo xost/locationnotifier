@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.databinding.FragmentMapBinding
@@ -58,7 +59,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap){
         map?.let{
-            googleMap = it
+            b.vm.map=it
         }
         val geoCoo = LatLng(22.3, 33.4)
     }
@@ -91,5 +92,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onLowMemory() {
         super.onLowMemory()
         b.mapView.onLowMemory()
+    }
+
+    private fun setOnMapLongTap(map: GoogleMap){
+        map.setOnMapLongClickListener {
+            b.vm.marker?.let{
+                it.remove()
+            }
+            b.vm.newMarker(it)
+            map.addMarker(b.vm.marker)
+        }
     }
 }
