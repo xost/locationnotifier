@@ -1,9 +1,12 @@
 package me.host43.locationnotifier.map
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -20,7 +23,7 @@ import me.host43.locationnotifier.databinding.FragmentMapBinding
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var b: FragmentMapBinding
-    private lateinit var googleMap: GoogleMap
+    private val REQUEST_LOCATION_PERMISSION_CODE = 666
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,7 +61,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(map: GoogleMap){
-        b.vm!!.setMap(map)
+        b.vm?.setMap(map)
         setOnMapLongTap(map)
     }
 
@@ -98,5 +101,30 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 it.newMarker(latLng)
             }
         }
+    }
+
+    private fun isPermissionGranted(){
+
+    }
+
+    private fun enableMyLocation(map: GoogleMap){
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf<String>(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                REQUEST_LOCATION_PERMISSION_CODE
+            )
+        }
+        map.isMyLocationEnabled=true
     }
 }
