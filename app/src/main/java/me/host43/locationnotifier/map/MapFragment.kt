@@ -58,10 +58,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(map: GoogleMap){
-        map?.let{
-            b.vm.map=it
-        }
-        val geoCoo = LatLng(22.3, 33.4)
+        b.vm!!.setMap(map)
+        setOnMapLongTap(map)
     }
 
     override fun onStart() {
@@ -95,12 +93,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setOnMapLongTap(map: GoogleMap){
-        map.setOnMapLongClickListener {
-            b.vm.marker?.let{
-                it.remove()
+        map.setOnMapLongClickListener { latLng ->
+            b.vm?.let{
+                it.newMarker(latLng)
             }
-            b.vm.newMarker(it)
-            map.addMarker(b.vm.marker)
         }
     }
 }

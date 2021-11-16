@@ -7,23 +7,31 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.launch
 import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabaseDao
 
-class MapViewModel(private val db: PointDatabaseDao, app: Application, map: GoogleMap) : AndroidViewModel(app) {
+class MapViewModel(private val db: PointDatabaseDao, app: Application) : AndroidViewModel(app) {
 
     private val _navigateToTrackPoints = MutableLiveData<Boolean>()
     val navigateToTrackPoints: LiveData<Boolean>
         get() = _navigateToTrackPoints
 
-    var marker = MarkerOptions()
-    var map: GoogleMap = map
-        get() = field
-        set(value) {field=value}
+    private lateinit var _map: GoogleMap
+    val map: GoogleMap
+        get() = _map
+
+    private var _marker: Marker? = null
+    val marker: Marker?
+        get() = _marker
 
     val p = Point()
+
+    fun setMap(m: GoogleMap) {
+        _map = m
+    }
 
     fun onAddButton() {
         viewModelScope.launch {
@@ -32,10 +40,11 @@ class MapViewModel(private val db: PointDatabaseDao, app: Application, map: Goog
         }
     }
 
-    fun newMarker(ll: LatLng): MarkerOptions{
-        marker = MarkerOptions().position(ll)
-        marker.
-        return marker
+    fun newMarker(ll: LatLng) {
+        marker?.remove()
+        _marker = map.addMarker(MarkerOptions().position(ll).draggable(true))
+        p.latitude=ll.latitude
+        p.longitude=ll.longitude
     }
 
     fun navigateToTrackPointsDone() {
