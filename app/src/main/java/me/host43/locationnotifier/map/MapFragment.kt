@@ -12,6 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
@@ -23,6 +26,7 @@ import me.host43.locationnotifier.databinding.FragmentMapBinding
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var b: FragmentMapBinding
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val REQUEST_LOCATION_PERMISSION_CODE = 666
 
     override fun onCreateView(
@@ -41,11 +45,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val vmf = MapViewModelFactory(ds, app)
         val vm = ViewModelProvider(this, vmf).get(MapViewModel::class.java)
 
-        b.lifecycleOwner=this
-        b.vm=vm
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
+
+        b.lifecycleOwner = this
+        b.vm = vm
 
         vm.navigateToTrackPoints.observe(viewLifecycleOwner, Observer {
-            if (it){
+            if (it) {
                 this.findNavController().navigate(
                     MapFragmentDirections.actionMapFragmentToTrackPointsFragment()
                 )
@@ -60,9 +66,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return b.root
     }
 
-    override fun onMapReady(map: GoogleMap){
+
+    override fun onMapReady(map: GoogleMap) {
         b.vm?.setMap(map)
         setOnMapLongTap(map)
+        enableMyLocation(map)
     }
 
     override fun onStart() {
@@ -95,36 +103,42 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         b.mapView.onLowMemory()
     }
 
-    private fun setOnMapLongTap(map: GoogleMap){
+    private fun setOnMapLongTap(map: GoogleMap) {
         map.setOnMapLongClickListener { latLng ->
-            b.vm?.let{
+            b.vm?.let {
                 it.newMarker(latLng)
             }
         }
     }
 
-    private fun isPermissionGranted(){
+    private fun isPermissionGranted() {
 
     }
 
-    private fun enableMyLocation(map: GoogleMap){
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf<String>(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
+    private fun enableMyLocation(map: GoogleMap) {
+        activity?.let {
+            if (ActivityCompat.checkSelfPermission(
+                    it,
                     Manifest.permission.ACCESS_FINE_LOCATION
-                ),
-                REQUEST_LOCATION_PERMISSION_CODE
-            )
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    it,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    it,
+                    arrayOf<String>(
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ),
+                    REQUEST_LOCATION_PERMISSION_CODE
+                )
+            }
+            map.isMyLocationEnabled = true
+            fusedLocationClient.lastLocation.addOnSuccessListener {
+                val ll = LatLng(it.latitude,it.longitude)
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll,15.0F))
+            }
         }
-        map.isMyLocationEnabled=true
     }
 }
