@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -58,6 +59,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 vm.navigateToTrackPointsDone()
             }
         })
+
+        vm.placenameIsNotSetNotify.observe(viewLifecycleOwner, Observer {
+            if (it){
+                Toast.makeText(context,"please set a placename",Toast.LENGTH_SHORT).show()
+                vm.placenameNotSetNotifyDone()
+            }
+        })
+
+        vm.placeIsNotSetNotify.observe(viewLifecycleOwner, Observer {
+            if (it){
+                Toast.makeText(context,"please set a place",Toast.LENGTH_SHORT).show()
+                vm.placeNotSetNotifyDone()
+            }
+        })
+
+        b.cancelButton.setOnClickListener {
+            this.findNavController().navigate(
+                MapFragmentDirections.actionMapFragmentToTrackPointsFragment()
+            )
+        }
 
         b.mapView.onCreate(savedInstanceState)
         b.mapView.onResume()

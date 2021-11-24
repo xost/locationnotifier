@@ -1,7 +1,6 @@
 package me.host43.locationnotifier.map
 
 import android.app.Application
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,9 +19,13 @@ class MapViewModel(private val db: PointDatabaseDao, app: Application) : Android
     val navigateToTrackPoints: LiveData<Boolean>
         get() = _navigateToTrackPoints
 
-    private val _isPlaceSet = MutableLiveData<Boolean>(false)
-    val isPlaceSet: LiveData<Boolean>
-        get() = _isPlaceSet
+    private val _placeIsNotSetNotify = MutableLiveData<Boolean>(false)
+    val placeIsNotSetNotify: LiveData<Boolean>
+        get() = _placeIsNotSetNotify
+
+    private val _placenameIsNotSetNotify = MutableLiveData<Boolean>(false)
+    val placenameIsNotSetNotify: LiveData<Boolean>
+        get() = _placenameIsNotSetNotify
 
     private lateinit var _map: GoogleMap
     val map: GoogleMap
@@ -39,10 +42,15 @@ class MapViewModel(private val db: PointDatabaseDao, app: Application) : Android
     }
 
     fun onAddButton() {
+        if (marker == null){
+            _placeIsNotSetNotify.value = true
+            return
+        }
+        if (p.name == ""){
+            _placenameIsNotSetNotify.value = true
+            return
+        }
         viewModelScope.launch {
-            if (marker == null){
-                _isPlaceSet.value = false /// !!!!!!!!!!!!!!!!!!!!!!
-            }
             db.insert(p)
             _navigateToTrackPoints.value = true
         }
@@ -57,5 +65,13 @@ class MapViewModel(private val db: PointDatabaseDao, app: Application) : Android
 
     fun navigateToTrackPointsDone() {
         _navigateToTrackPoints.value = false
+    }
+
+    fun placeNotSetNotifyDone(){
+        _placeIsNotSetNotify.value=false
+    }
+
+    fun placenameNotSetNotifyDone(){
+        _placenameIsNotSetNotify.value=false
     }
 }

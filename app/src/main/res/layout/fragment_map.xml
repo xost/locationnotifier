@@ -37,6 +37,7 @@
             android:inputType="textPersonName"
             android:minHeight="48dp"
             android:textColorHint="#757575"
+            android:text="@={vm.p.name}"
             app:layout_constraintBottom_toTopOf="@id/add_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
