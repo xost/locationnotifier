@@ -18,5 +18,7 @@
     <string name="clean_button">Clean all</string>
     <string name="clear_button">remove all</string>
     <string name="add_button_text">Add</string>
+    <string name="cancel_button_text">Cancel</string>
+    <string name="placename_hint">enter place name here</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

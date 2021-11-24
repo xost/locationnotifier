@@ -1,6 +1,7 @@
 package me.host43.locationnotifier.map
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,6 +20,10 @@ class MapViewModel(private val db: PointDatabaseDao, app: Application) : Android
     val navigateToTrackPoints: LiveData<Boolean>
         get() = _navigateToTrackPoints
 
+    private val _isPlaceSet = MutableLiveData<Boolean>(false)
+    val isPlaceSet: LiveData<Boolean>
+        get() = _isPlaceSet
+
     private lateinit var _map: GoogleMap
     val map: GoogleMap
         get() = _map
@@ -35,6 +40,9 @@ class MapViewModel(private val db: PointDatabaseDao, app: Application) : Android
 
     fun onAddButton() {
         viewModelScope.launch {
+            if (marker == null){
+                _isPlaceSet.value = false /// !!!!!!!!!!!!!!!!!!!!!!
+            }
             db.insert(p)
             _navigateToTrackPoints.value = true
         }
