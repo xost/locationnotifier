@@ -11,7 +11,7 @@ class MapViewModelFactory(
     private val ds: PointDatabaseDao,
     private val app: Application,
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
             return MapViewModel(ds, app) as T
         }

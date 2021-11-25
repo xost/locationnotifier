@@ -1,13 +1,11 @@
 package me.host43.locationnotifier.map
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -19,7 +17,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.databinding.FragmentMapBinding
@@ -27,8 +24,8 @@ import me.host43.locationnotifier.databinding.FragmentMapBinding
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var b: FragmentMapBinding
+    private lateinit var vm: MapViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val REQUEST_LOCATION_PERMISSION_CODE = 666
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,7 +41,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val app = requireNotNull(this.activity).application
         val ds = PointDatabase.getInstance(app).dao
         val vmf = MapViewModelFactory(ds, app)
-        val vm = ViewModelProvider(this, vmf).get(MapViewModel::class.java)
+        vm = ViewModelProvider(this, vmf).get(MapViewModel::class.java)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
 
@@ -61,15 +58,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         })
 
         vm.placenameIsNotSetNotify.observe(viewLifecycleOwner, Observer {
-            if (it){
-                Toast.makeText(context,"please set a placename",Toast.LENGTH_SHORT).show()
+            if (it) {
+                Toast.makeText(context, "please set a placename", Toast.LENGTH_SHORT).show()
                 vm.placenameNotSetNotifyDone()
             }
         })
 
         vm.placeIsNotSetNotify.observe(viewLifecycleOwner, Observer {
-            if (it){
-                Toast.makeText(context,"please set a place",Toast.LENGTH_SHORT).show()
+            if (it) {
+                Toast.makeText(context, "please set a place", Toast.LENGTH_SHORT).show()
                 vm.placeNotSetNotifyDone()
             }
         })
@@ -89,7 +86,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
 
     override fun onMapReady(map: GoogleMap) {
-        b.vm?.setMap(map)
+        vm.setMap(map)
         setOnMapLongTap(map)
         enableMyLocation(map)
     }
@@ -126,40 +123,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun setOnMapLongTap(map: GoogleMap) {
         map.setOnMapLongClickListener { latLng ->
-            b.vm?.let {
-                it.newMarker(latLng)
-            }
+            vm.newMarker(latLng)
         }
     }
 
-    private fun isPermissionGranted() {
-
-    }
-
+    @SuppressLint("MissingPermission")
     private fun enableMyLocation(map: GoogleMap) {
-        activity?.let {
-            if (ActivityCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    it,
-                    arrayOf<String>(
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ),
-                    REQUEST_LOCATION_PERMISSION_CODE
-                )
-            }
-            map.isMyLocationEnabled = true
-            fusedLocationClient.lastLocation.addOnSuccessListener {
-                val ll = LatLng(it.latitude,it.longitude)
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll,15.0F))
-            }
+        map.isMyLocationEnabled = true
+        fusedLocationClient.lastLocation.addOnSuccessListener {
+            val ll = LatLng(it.latitude, it.longitude)
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15.0F))
         }
     }
 }
