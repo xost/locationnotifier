@@ -12,8 +12,10 @@ class MainActivity : AppCompatActivity() {
     private val requestpermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             if (it["android.permission.ACCESS_COARSE_LOCATION"] != true ||
-                it["android.permission.ACCESS_FINE_LOCATION"] != true
+                it["android.permission.ACCESS_FINE_LOCATION"] != true ||
+                it["android.permission.ACCESS_BACKGROUND_LOCATION"] != true
             ) {
+                TODO ("Show window that explains why app is needed with permissions and give a choice to \"Give permissions\" or \"Exit\" ")
                 finish()
             }
         }
@@ -25,7 +27,9 @@ class MainActivity : AppCompatActivity() {
         requestpermissions.launch(
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION)
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+            )
         )
 
         val b = DataBindingUtil.setContentView<ActivityMainBinding>(

@@ -1,5 +1,6 @@
 package me.host43.locationnotifier.trackpoints
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import me.host43.locationnotifier.LiveLocation.LiveLocationService
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.databinding.FragmentTrackPointsBinding
@@ -48,8 +50,28 @@ class TrackPointsFragment : Fragment() {
             }
         })
 
-        vm.points.observe(viewLifecycleOwner, Observer {
-            it?.let{
+        vm.eventGoButton.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                //Start LiveLocationService
+                //Change button to STOP
+                activity?.let { a ->
+                    val intentStart = Intent(context, LiveLocationService::class.java)
+                    a.startService(intentStart)
+                    //check if service is start
+                    vm.startServiceDone()
+                }
+            }
+        })
+
+        vm.eventStartServiceDone.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                //Change "Go" button to "Stop" button
+            }
+        })
+
+        vm.points.observe(viewLifecycleOwner, Observer
+        {
+            it?.let {
                 adapter.submitList(it)
             }
         })

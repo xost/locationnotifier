@@ -1,6 +1,8 @@
 package me.host43.locationnotifier.trackpoints
 
+import android.app.Activity
 import android.app.Application
+import android.app.PendingIntent.getActivity
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -19,6 +21,14 @@ class TrackPointsViewModel(val db: PointDatabaseDao, app: Application) : Android
     val eventAddPointDone: LiveData<Boolean>
         get() = _eventAddPointDone
 
+    private val _eventGoButton = MutableLiveData<Boolean>()
+    val eventGoButton: LiveData<Boolean>
+        get() = _eventGoButton
+
+    private val _eventStartServiceDone = MutableLiveData<Boolean>()
+    val eventStartServiceDone: LiveData<Boolean>
+        get() = _eventStartServiceDone
+
 
     var points = db.getAllPoints()
 
@@ -26,8 +36,19 @@ class TrackPointsViewModel(val db: PointDatabaseDao, app: Application) : Android
         _eventAddPoint.value = true
     }
 
+    fun onGoButton(){
+        _eventGoButton.value = true
+    }
+
     fun navigationComplete() {
         _eventAddPoint.value = false
+    }
+
+    fun startServiceDone(){
+        _eventStartServiceDone.value = true
+    }
+
+    fun startLiveLocationService(){
     }
 
     fun clearAll(){
