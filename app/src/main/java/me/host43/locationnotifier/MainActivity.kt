@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
                 it["android.permission.ACCESS_FINE_LOCATION"] != true ||
                 it["android.permission.ACCESS_BACKGROUND_LOCATION"] != true
             ) {
-                TODO ("Show window that explains why app is needed with permissions and give a choice to \"Give permissions\" or \"Exit\" ")
+                //TODO ("Show window that explains why app is needed with permissions and give a choice to \"Give permissions\" or \"Exit\" ")
                 finish()
             }
         }

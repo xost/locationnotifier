@@ -1,5 +1,7 @@
 package me.host43.locationnotifier.trackpoints
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import me.host43.locationnotifier.BuildConfig
 import me.host43.locationnotifier.LiveLocation.LiveLocationService
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
@@ -37,6 +40,14 @@ class TrackPointsFragment : Fragment() {
         b.lifecycleOwner = this
         b.vm = vm
 
+        //check is LiveLocationService started ???
+        activity?.let{
+            Log.d("isServiceStarted: ","ACTION_INIT")
+            Log.d("isServiceStarted: LiveLocationService.isServiceStarted: ", LiveLocationService.isServiceStarted.toString())
+            Log.d("isServiceStarted: vm.eventStartStopService.value: ", vm.eventStartStopService.value.toString())
+            b.goButton.isChecked = LiveLocationService.isServiceStarted
+        }
+
         val adapter = PointAdapter()
         b.pointList.adapter = adapter
 
@@ -50,31 +61,39 @@ class TrackPointsFragment : Fragment() {
             }
         })
 
-        vm.eventGoButton.observe(viewLifecycleOwner, Observer {
-            if (it) {
+        vm.eventStartStopService.observe(viewLifecycleOwner, Observer {
+            if (it && !LiveLocationService.isServiceStarted) {
                 //Start LiveLocationService
                 //Change button to STOP
                 activity?.let { a ->
+                    Log.d("isServiceStarted",": ACTION_START")
+                    Log.d("isServiceStarted: LiveLocationService.isServiceStarted: ", LiveLocationService.isServiceStarted.toString())
+                    Log.d("isServiceStarted: vm.eventStartStopService.value: ", vm.eventStartStopService.value.toString())
                     val intentStart = Intent(context, LiveLocationService::class.java)
                     a.startService(intentStart)
-                    //check if service is start
-                    vm.startServiceDone()
+                }
+            }
+            if(!it && LiveLocationService.isServiceStarted){
+                activity?.let{ a ->
+                    Log.d("isServiceStarted",": ACTION_STOP")
+                    Log.d("isServiceStarted: LiveLocationService.isServiceStarted: ", LiveLocationService.isServiceStarted.toString())
+                    Log.d("isServiceStarted: vm.eventStartStopService.value: ", vm.eventStartStopService.value.toString())
+                    val intentStop = Intent(context,LiveLocationService::class.java)
+                    intentStop.action = ACTION_STOP_FOREGROUND
+                    a.startService(intentStop)
                 }
             }
         })
 
-        vm.eventStartServiceDone.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                //Change "Go" button to "Stop" button
-            }
-        })
-
-        vm.points.observe(viewLifecycleOwner, Observer
-        {
+        vm.points.observe(viewLifecycleOwner, Observer{
             it?.let {
                 adapter.submitList(it)
             }
         })
         return b.root
+    }
+
+    companion object {
+        const val ACTION_STOP_FOREGROUND = "${BuildConfig.APPLICATION_ID}.stopforeground"
     }
 }

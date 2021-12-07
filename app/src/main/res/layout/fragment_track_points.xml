@@ -38,13 +38,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/go_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="@string/go_button_text"
-            android:onClickListener="@{() -> vm.onGoButton()}"
+            android:text="@string/onoff_text"
+            android:onCheckedChanged="@{(switch,checked) -> vm.eventServiceStateChanged(checked)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>

@@ -7,11 +7,13 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.IBinder
+import android.provider.SyncStateContract
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.*
 import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.R
+import me.host43.locationnotifier.trackpoints.TrackPointsFragment
 
 class LiveLocationService : Service() {
     override fun onBind(p0: Intent?): IBinder? {
@@ -20,16 +22,25 @@ class LiveLocationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action != null && intent.action.equals("LiveLocation", ignoreCase = true)) {
+        if (intent?.action != null && intent.action.equals(
+                TrackPointsFragment.ACTION_STOP_FOREGROUND,
+                ignoreCase = true
+            )
+        ) {
+            Log.d("LiveLocationService:","ACTION STOP")
+            isServiceStarted = false
             stopForeground(true)
-            stopSelf()
+            //stopSelf() //?????? what does it do ?
+        }else {
+            Log.d("LiveLocationService:","ACTION START")
+            generateForegroundNotification()
+            isServiceStarted = true
         }
-        generateForegroundNotification()
         return START_NOT_STICKY
     }
 
     fun generateForegroundNotification() {
-        Log.i("DEBUG","start requset location")
+        Log.i("DEBUG", "start requset location")
         val intentMainLanding = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, intentMainLanding, 0)
         val iconNotification = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
@@ -62,7 +73,7 @@ class LiveLocationService : Service() {
             .setOnlyAlertOnce(true)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
-        iconNotification?.let{
+        iconNotification?.let {
             builder.setLargeIcon(Bitmap.createScaledBitmap(iconNotification, 128, 128, false))
         }
         builder.color = resources.getColor(R.color.purple_200)
@@ -83,10 +94,15 @@ class LiveLocationService : Service() {
             object : LocationCallback() {
                 override fun onLocationResult(p0: LocationResult) {
                     val ll = p0.lastLocation //ll - last location
-                    Log.i("DEBUG","latitude: ${ll.latitude}, longtitude: ${ll.longitude }")
+                    Log.i("DEBUG", "latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
                 }
             },
             null
         )
     }
+
+    companion object {
+        var isServiceStarted: Boolean = false
+    }
+
 }
