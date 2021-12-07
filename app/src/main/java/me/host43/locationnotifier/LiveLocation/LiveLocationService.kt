@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.location.Location
 import android.os.IBinder
+import android.os.Looper
 import android.provider.SyncStateContract
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -16,23 +18,41 @@ import me.host43.locationnotifier.R
 import me.host43.locationnotifier.trackpoints.TrackPointsFragment
 
 class LiveLocationService : Service() {
+
+    private lateinit var notification: Notification
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var builder: NotificationCompat.Builder
+
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    private var ll: Location? = null
+
     override fun onBind(p0: Intent?): IBinder? {
-        requestLocationUpdates()
+        //initLocationUpdates()
         return null
     }
 
+    @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action != null && intent.action.equals(
                 TrackPointsFragment.ACTION_STOP_FOREGROUND,
                 ignoreCase = true
             )
         ) {
-            Log.d("LiveLocationService:","ACTION STOP")
+            Log.d("LiveLocationService:", "ACTION STOP")
             isServiceStarted = false
+
             stopForeground(true)
             //stopSelf() //?????? what does it do ?
-        }else {
-            Log.d("LiveLocationService:","ACTION START")
+        } else {
+            Log.d("LiveLocationService:", "ACTION START")
+            initLocationUpdates()
+            fusedLocationProviderClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper(),
+            )
             generateForegroundNotification()
             isServiceStarted = true
         }
@@ -44,7 +64,7 @@ class LiveLocationService : Service() {
         val intentMainLanding = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, intentMainLanding, 0)
         val iconNotification = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
-        val notificationManager =
+        notificationManager =
             this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannelGroup(
             NotificationChannelGroup("location_group", "location")
@@ -57,7 +77,7 @@ class LiveLocationService : Service() {
         notificationChannel.enableLights(false)
         notificationChannel.lockscreenVisibility = Notification.VISIBILITY_SECRET
         notificationManager.createNotificationChannel(notificationChannel)
-        val builder = NotificationCompat.Builder(this, "service_channel")
+        builder = NotificationCompat.Builder(this, "service_channel")
         builder.setContentTitle(
             StringBuilder(resources.getString(R.string.app_name)).append(" service is running")
                 .toString()
@@ -77,28 +97,33 @@ class LiveLocationService : Service() {
             builder.setLargeIcon(Bitmap.createScaledBitmap(iconNotification, 128, 128, false))
         }
         builder.color = resources.getColor(R.color.purple_200)
-        val notification = builder.build()
+        notification = builder.build()
         startForeground(1, notification)
     }
 
-    @SuppressLint("MissingPermission")
-    private fun requestLocationUpdates() {
-        val req = LocationRequest.create().apply {
-            setInterval(10000)
-            setFastestInterval(5000)
-            setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+    //    @SuppressLint("MissingPermission")
+    private fun initLocationUpdates() {
+        Log.d("initLocationUpdates", "!!!!!!!!!!!!!!")
+        locationRequest = LocationRequest.create().apply {
+            interval = 10000
+            fastestInterval = 5000
+            maxWaitTime = 2000 * 60
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
-        val cli = LocationServices.getFusedLocationProviderClient(this@LiveLocationService)
-        cli.requestLocationUpdates(
-            req,
-            object : LocationCallback() {
-                override fun onLocationResult(p0: LocationResult) {
-                    val ll = p0.lastLocation //ll - last location
-                    Log.i("DEBUG", "latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
-                }
-            },
-            null
-        )
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(this)
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(p0: LocationResult) {
+                super.onLocationResult(p0)
+                val ll = p0.lastLocation //ll - last location
+                Log.i("DEBUG", "latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
+                notification =
+                    builder.setContentText("latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
+                        .build()
+                notificationManager.notify(1, notification)
+            }
+        }
+
     }
 
     companion object {
