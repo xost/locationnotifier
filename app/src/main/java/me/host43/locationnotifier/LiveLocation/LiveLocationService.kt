@@ -42,6 +42,7 @@ class LiveLocationService : Service() {
         ) {
             Log.d("LiveLocationService:", "ACTION STOP")
             isServiceStarted = false
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback)
 
             stopForeground(true)
             //stopSelf() //?????? what does it do ?
