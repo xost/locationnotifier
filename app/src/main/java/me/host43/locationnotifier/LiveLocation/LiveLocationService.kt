@@ -45,6 +45,7 @@ class LiveLocationService : Service() {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback)
 
             stopForeground(true)
+            Log.d("LiveLocationService: isServiceStarted", isServiceStarted.toString())
             //stopSelf() //?????? what does it do ?
         } else {
             Log.d("LiveLocationService:", "ACTION START")
@@ -56,6 +57,8 @@ class LiveLocationService : Service() {
             )
             generateForegroundNotification()
             isServiceStarted = true
+            startForeground(1, notification)
+            Log.d("LiveLocationService: isServiceStarted", isServiceStarted.toString())
         }
         return START_NOT_STICKY
     }
@@ -99,7 +102,6 @@ class LiveLocationService : Service() {
         }
         builder.color = resources.getColor(R.color.purple_200)
         notification = builder.build()
-        startForeground(1, notification)
     }
 
     //    @SuppressLint("MissingPermission")

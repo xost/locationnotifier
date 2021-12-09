@@ -21,9 +21,7 @@ class TrackPointsViewModel(val db: PointDatabaseDao, app: Application) : Android
     val eventAddPointDone: LiveData<Boolean>
         get() = _eventAddPointDone
 
-    private val _eventStartStopService = MutableLiveData<Boolean>(false)
-    val eventStartStopService: LiveData<Boolean>
-        get() = _eventStartStopService
+    val eventStartStopService = MutableLiveData<Boolean>(false)
 
     var points = db.getAllPoints()
 
@@ -36,7 +34,7 @@ class TrackPointsViewModel(val db: PointDatabaseDao, app: Application) : Android
     }
 
     fun eventServiceStateChanged(state: Boolean){
-        _eventStartStopService.value = state
+        eventStartStopService.value = state
     }
 
     fun clearAll(){
