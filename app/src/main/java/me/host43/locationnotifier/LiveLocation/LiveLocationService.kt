@@ -16,6 +16,7 @@ import com.google.android.gms.location.*
 import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.trackpoints.TrackPointsFragment
+import me.host43.locationnotifier.trackpoints.TrackPointsViewModel
 
 class LiveLocationService : Service() {
 
@@ -36,7 +37,7 @@ class LiveLocationService : Service() {
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action != null && intent.action.equals(
-                TrackPointsFragment.ACTION_STOP_FOREGROUND,
+                TrackPointsViewModel.ACTION_STOP_FOREGROUND,
                 ignoreCase = true
             )
         ) {
@@ -108,10 +109,10 @@ class LiveLocationService : Service() {
     private fun initLocationUpdates() {
         Log.d("initLocationUpdates", "!!!!!!!!!!!!!!")
         locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
+            interval = 2000
+            fastestInterval = 1000
             maxWaitTime = 2000 * 60
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
         }
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this)
@@ -126,6 +127,10 @@ class LiveLocationService : Service() {
                 notificationManager.notify(1, notification)
             }
         }
+
+    }
+
+    fun startService(){
 
     }
 
