@@ -13,10 +13,7 @@ import android.os.Looper
 import android.provider.SyncStateContract
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.google.android.gms.location.*
 import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.R
@@ -27,7 +24,14 @@ import me.host43.locationnotifier.trackpoints.TrackPointsFragment
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel.Companion.LOCATION_RECEIVED
 
-class LiveLocationService : Service() {
+class LiveLocationService : LifecycleService() {
+
+
+    companion object {
+        var isServiceStarted: Boolean = false
+        val lastLocation = MutableLiveData<Location>()
+    }
+
 
     private lateinit var notification: Notification
     private lateinit var notificationManager: NotificationManager
@@ -36,10 +40,6 @@ class LiveLocationService : Service() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
-
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -56,8 +56,9 @@ class LiveLocationService : Service() {
         ) {
             isServiceStarted = false
             fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-
+            notificationManager.cancel(1)
             stopForeground(true)
+            stopSelf()
         } else {
             fusedLocationProviderClient.requestLocationUpdates(
                 locationRequest,
@@ -125,7 +126,8 @@ class LiveLocationService : Service() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
-                val ll = p0.lastLocation //ll - last location
+                val ll = p0.lastLocation
+                lastLocation.postValue(ll)
                 notification =
                     builder.setContentText("latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
                         .build()
@@ -138,9 +140,4 @@ class LiveLocationService : Service() {
         }
 
     }
-
-    companion object {
-        var isServiceStarted: Boolean = false
-    }
-
 }

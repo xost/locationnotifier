@@ -71,6 +71,10 @@ class TrackPointsFragment : Fragment() {
             }
         })
 
+        LiveLocationService.lastLocation.observe(viewLifecycleOwner, Observer {
+            Log.d("FRAGEMENT","location has updated")
+        })
+
         return b.root
     }
 

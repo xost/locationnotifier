@@ -72,10 +72,6 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
         }
     }
 
-    fun getAllPoints() : List<Point>? {
-        return db.getAllPoints().value
-    }
-
     fun logAllPoints(){
         points.value?.forEach{
             Log.d("TrackPointsViewModel","${it.name}")
