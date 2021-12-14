@@ -80,6 +80,12 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
         return db.getAllPoints().value
     }
 
+    fun logAllPoints(){
+        points.value?.forEach{
+            Log.d("TrackPointsViewModel","${it.name}")
+        }
+    }
+
     companion object {
         const val ACTION_STOP_FOREGROUND = "${BuildConfig.APPLICATION_ID}.stopforeground"
         const val LOCATION_RECEIVED = "${BuildConfig.APPLICATION_ID}.locationreceived"
