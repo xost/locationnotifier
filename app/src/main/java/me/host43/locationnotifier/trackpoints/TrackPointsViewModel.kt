@@ -2,6 +2,7 @@ package me.host43.locationnotifier.trackpoints
 
 import android.app.Activity
 import android.app.Application
+import android.app.PendingIntent
 import android.app.PendingIntent.getActivity
 import android.content.Intent
 import android.util.Log
@@ -48,6 +49,7 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
         val state = LiveLocationService.isServiceStarted
         val ctx = app.applicationContext
         val intent = Intent(ctx, LiveLocationService::class.java)
+        val pendingIntent = PendingIntent.getActivity(ctx,1,intent,0)
         Log.d("LiveLocationService.isStarted: ","${state}")
         Log.d("Switch state: ","${checked}")
         if (!state && checked) {

@@ -61,7 +61,7 @@ class LiveLocationService : Service() {
             startForeground(1, notification)
             Log.d("LiveLocationService: isServiceStarted", isServiceStarted.toString())
         }
-        return START_NOT_STICKY
+        return START_NOT_STICKY // ?????????????
     }
 
     fun generateForegroundNotification() {
@@ -127,10 +127,6 @@ class LiveLocationService : Service() {
                 notificationManager.notify(1, notification)
             }
         }
-
-    }
-
-    fun startService(){
 
     }
 
