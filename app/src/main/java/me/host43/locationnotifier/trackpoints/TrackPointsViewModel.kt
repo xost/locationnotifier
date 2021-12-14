@@ -4,7 +4,9 @@ import android.app.Activity
 import android.app.Application
 import android.app.PendingIntent
 import android.app.PendingIntent.getActivity
+import android.content.BroadcastReceiver
 import android.content.Intent
+import android.content.IntentFilter
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -13,7 +15,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.host43.locationnotifier.BuildConfig
 import me.host43.locationnotifier.LiveLocation.LiveLocationService
+import me.host43.locationnotifier.LocationReceiver.LocationBroadcastReceiver
 import me.host43.locationnotifier.MainActivity
+import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabaseDao
 
 class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Application) : AndroidViewModel(app) {
@@ -47,17 +51,20 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
     fun startStopService(checked: Boolean){
         //it checked if started
         val state = LiveLocationService.isServiceStarted
-        val ctx = app.applicationContext
-        val intent = Intent(ctx, LiveLocationService::class.java)
-        val pendingIntent = PendingIntent.getActivity(ctx,1,intent,0)
+        val intent = Intent(this.getApplication(), LiveLocationService::class.java)
+        val intentFilter = IntentFilter(LOCATION_RECEIVED)
         Log.d("LiveLocationService.isStarted: ","${state}")
         Log.d("Switch state: ","${checked}")
+
+        val receiver = LocationBroadcastReceiver(this)
+
         if (!state && checked) {
+            app.registerReceiver(receiver,intentFilter,0)
         }
         if (state && !checked){
             intent.action = ACTION_STOP_FOREGROUND
         }
-        ctx.startService(intent)
+        app.startService(intent)
         Log.d("###","startService called")
         Log.d("LiveLocationService.isStarted: ","${state}")
     }
@@ -68,7 +75,13 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
             db.clear()
         }
     }
+
+    fun getAllPoints() : List<Point>? {
+        return db.getAllPoints().value
+    }
+
     companion object {
         const val ACTION_STOP_FOREGROUND = "${BuildConfig.APPLICATION_ID}.stopforeground"
+        const val LOCATION_RECEIVED = "${BuildConfig.APPLICATION_ID}.locationreceived"
     }
 }

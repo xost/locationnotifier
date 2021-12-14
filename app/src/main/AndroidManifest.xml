@@ -22,19 +22,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <service android:name=".LiveLocation.LiveLocationService"/>
-        <!-- <receiver
-            android:name=".receiver.RestartBackgroundService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="restart_service"/>
-            </intent-filter>
-        </receiver> -->
     </application>
 
 </manifest>

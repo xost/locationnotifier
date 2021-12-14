@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Location
@@ -17,6 +18,7 @@ import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.trackpoints.TrackPointsFragment
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel
+import me.host43.locationnotifier.trackpoints.TrackPointsViewModel.Companion.LOCATION_RECEIVED
 
 class LiveLocationService : Service() {
 
@@ -125,6 +127,10 @@ class LiveLocationService : Service() {
                     builder.setContentText("latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
                         .build()
                 notificationManager.notify(1, notification)
+                val intent = Intent()
+                intent.action = LOCATION_RECEIVED
+                intent.putExtra("lastLocation",p0.lastLocation)
+                sendBroadcast(intent)
             }
         }
 
