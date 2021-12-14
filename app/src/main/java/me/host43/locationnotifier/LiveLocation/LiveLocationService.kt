@@ -13,9 +13,16 @@ import android.os.Looper
 import android.provider.SyncStateContract
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.google.android.gms.location.*
 import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.R
+import me.host43.locationnotifier.database.Point
+import me.host43.locationnotifier.database.PointDatabase
+import me.host43.locationnotifier.database.PointDatabaseDao
 import me.host43.locationnotifier.trackpoints.TrackPointsFragment
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel.Companion.LOCATION_RECEIVED
@@ -29,30 +36,29 @@ class LiveLocationService : Service() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
-    private var ll: Location? = null
 
     override fun onBind(p0: Intent?): IBinder? {
-        //initLocationUpdates()
         return null
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        initLocationUpdates()
     }
 
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         if (intent?.action != null && intent.action.equals(
                 TrackPointsViewModel.ACTION_STOP_FOREGROUND,
                 ignoreCase = true
             )
         ) {
-            Log.d("LiveLocationService:", "ACTION STOP")
             isServiceStarted = false
             fusedLocationProviderClient.removeLocationUpdates(locationCallback)
 
             stopForeground(true)
-            Log.d("LiveLocationService: isServiceStarted", isServiceStarted.toString())
-            //stopSelf() //?????? what does it do ?
         } else {
-            Log.d("LiveLocationService:", "ACTION START")
-            initLocationUpdates()
             fusedLocationProviderClient.requestLocationUpdates(
                 locationRequest,
                 locationCallback,
@@ -67,7 +73,6 @@ class LiveLocationService : Service() {
     }
 
     fun generateForegroundNotification() {
-        Log.i("DEBUG", "start requset location")
         val intentMainLanding = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, intentMainLanding, 0)
         val iconNotification = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
@@ -109,7 +114,6 @@ class LiveLocationService : Service() {
 
     //    @SuppressLint("MissingPermission")
     private fun initLocationUpdates() {
-        Log.d("initLocationUpdates", "!!!!!!!!!!!!!!")
         locationRequest = LocationRequest.create().apply {
             interval = 2000
             fastestInterval = 1000
@@ -122,14 +126,13 @@ class LiveLocationService : Service() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
                 val ll = p0.lastLocation //ll - last location
-                Log.i("DEBUG", "latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
                 notification =
                     builder.setContentText("latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
                         .build()
                 notificationManager.notify(1, notification)
                 val intent = Intent()
-                intent.action = LOCATION_RECEIVED
-                intent.putExtra("lastLocation",p0.lastLocation)
+                intent.action = TrackPointsViewModel.LOCATION_RECEIVED
+                intent.putExtra("lastLocation",ll)
                 sendBroadcast(intent)
             }
         }

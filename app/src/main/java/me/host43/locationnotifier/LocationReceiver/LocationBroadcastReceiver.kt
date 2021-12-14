@@ -7,26 +7,24 @@ import android.location.Location
 import android.util.Log
 import androidx.lifecycle.LiveData
 import me.host43.locationnotifier.database.Point
+import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.database.PointDatabaseDao
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel.Companion.LOCATION_RECEIVED
 
-class LocationBroadcastReceiver(private val vm: TrackPointsViewModel): BroadcastReceiver() {
+class LocationBroadcastReceiver(private val ctx: Context): BroadcastReceiver() {
+
+    private val db = PointDatabase.getInstance(ctx)
 
     override fun onReceive(p0: Context?, p1: Intent?) {
-        Log.d("LocationBroadcastReceiver",LOCATION_RECEIVED)
         val extra = p1?.extras?.get("lastLocation") as Location
+        val db=PointDatabase.getInstance(ctx)
 
+        Log.d("LocationBroadcastReceiver",LOCATION_RECEIVED)
         Log.d("LocationBroadcastReceiver",
             "altitude: ${extra.altitude.toString()} longtitude: ${extra.longitude.toString()}")
-        Log.d("LocationBroadcastReceiver",
-            "points: ${vm.points}")
 
-        val points = vm.getAllPoints()
-        points?.forEach {
-            Log.d("LocationBroadcastReceiver",
-                "point name: ${it.name}")
-        }
-        vm.logAllPoints()
+        val points = db.dao.getAllPoints()
+        Log.d("LocationBroadcastReceiver",points.value.toString())
     }
 }

@@ -65,14 +65,12 @@ class TrackPointsFragment : Fragment() {
             }
         })
 
-        //vm.eventStartStopService.observe(viewLifecycleOwner, Observer {
-        //})
-
         vm.points.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitList(it)
             }
         })
+
         return b.root
     }
 

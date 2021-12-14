@@ -51,22 +51,18 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
     fun startStopService(checked: Boolean){
         //it checked if started
         val state = LiveLocationService.isServiceStarted
-        val intent = Intent(this.getApplication(), LiveLocationService::class.java)
-        val intentFilter = IntentFilter(LOCATION_RECEIVED)
-        Log.d("LiveLocationService.isStarted: ","${state}")
-        Log.d("Switch state: ","${checked}")
-
-        val receiver = LocationBroadcastReceiver(this)
+        val intent = Intent(app, LiveLocationService::class.java)
+        val br = LocationBroadcastReceiver(app)
 
         if (!state && checked) {
-            app.registerReceiver(receiver,intentFilter,0)
+            val intentFilter = IntentFilter(LOCATION_RECEIVED)
+            app.registerReceiver(br,intentFilter)
         }
         if (state && !checked){
             intent.action = ACTION_STOP_FOREGROUND
+            app.unregisterReceiver(br)
         }
         app.startService(intent)
-        Log.d("###","startService called")
-        Log.d("LiveLocationService.isStarted: ","${state}")
     }
 
     fun clearAll(){
