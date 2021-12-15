@@ -32,23 +32,14 @@ class TrackPointsFragment : Fragment() {
 
         val app = requireNotNull(this.activity).application
         val ds = PointDatabase.getInstance(app).dao
+        Log.d("TrackPointsFragment",ds.getAllPoints().value.toString())
         val vmFactory = TrackPointsViewModelFactory(ds, app)
         val vm = ViewModelProvider(this, vmFactory).get(TrackPointsViewModel::class.java)
 
         b.lifecycleOwner = this
         b.vm = vm
 
-        //check is LiveLocationService started ???
-        Log.d("isServiceStarted: ", "ACTION_INIT")
-        Log.d(
-            "isServiceStarted: LiveLocationService.isServiceStarted: ",
-            LiveLocationService.isServiceStarted.toString()
-        )
-        Log.d(
-            "isServiceStarted: vm.eventStartStopService.value: ",
-            vm.eventStartStopService.value.toString()
-        )
-        b.goButton.isChecked = LiveLocationService.isServiceStarted
+       b.goButton.isChecked = LiveLocationService.isServiceStarted
 
         val adapter = PointAdapter()
         b.pointList.adapter = adapter

@@ -6,12 +6,12 @@ import android.content.Intent
 import android.location.Location
 import android.util.Log
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel
-import me.host43.locationnotifier.trackpoints.TrackPointsViewModel.Companion.LOCATION_RECEIVED
+import me.host43.locationnotifier.util.Constants
 
 class LocationBroadcastReceiver(private val vm: TrackPointsViewModel): BroadcastReceiver() {
 
     override fun onReceive(p0: Context?, p1: Intent?) {
-        Log.d("LocationBroadcastReceiver",LOCATION_RECEIVED)
+        Log.d("LocationBroadcastReceiver",Constants.LOCATION_RECEIVED)
         val extra = p1?.extras?.get("lastLocation") as Location
 
         Log.d("LocationBroadcastReceiver",

@@ -39,27 +39,6 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
         _eventStartStopService.value = state
     }
 
-    //fun startStopService(checked: Boolean){
-    //    //it checked if started
-    //    val state = LiveLocationService.isServiceStarted
-    //    val intent = Intent(this.getApplication(), LiveLocationService::class.java)
-    //    val intentFilter = IntentFilter(LOCATION_RECEIVED)
-    //    Log.d("LiveLocationService.isStarted: ","${state}")
-    //    Log.d("Switch state: ","${checked}")
-
-    //    val receiver = LocationBroadcastReceiver(this)
-
-    //    if (!state && checked) {
-    //        app.registerReceiver(receiver,intentFilter,0)
-    //    }
-    //    if (state && !checked){
-    //        intent.action = ACTION_STOP_FOREGROUND
-    //    }
-    //    app.startService(intent)
-    //    Log.d("###","startService called")
-    //    Log.d("LiveLocationService.isStarted: ","${state}")
-    //}
-
     fun clearAll(){
         Log.i("cleanAll","on Clean all listener")
         viewModelScope.launch{
@@ -75,10 +54,5 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
         points.value?.forEach{
             Log.d("TrackPointsViewModel","${it.name}")
         }
-    }
-
-    companion object {
-        const val ACTION_STOP_FOREGROUND = "${BuildConfig.APPLICATION_ID}.stopforeground"
-        const val LOCATION_RECEIVED = "${BuildConfig.APPLICATION_ID}.locationreceived"
     }
 }

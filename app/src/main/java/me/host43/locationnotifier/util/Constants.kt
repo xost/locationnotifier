@@ -5,11 +5,13 @@ import me.host43.locationnotifier.BuildConfig
 
 class Constants {
     companion object{
-        val ACTION_START_SERVICE = "${BuildConfig.APPLICATION_ID}.STARTSERVICE"
-        val ACTION_STOP_SERVICE = "${BuildConfig.APPLICATION_ID}.STOPSERVICE"
+        const val ACTION_START_SERVICE = "${BuildConfig.APPLICATION_ID}.STARTSERVICE"
+        const val ACTION_STOP_SERVICE = "${BuildConfig.APPLICATION_ID}.STOPSERVICE"
 
-        val NOTIFICATION_CHANNEL_ID = ""
-        val NOTIFICATION_CHANNEL_NAME = ""
-        val NOTIFICATION_ID = 143
+        const val NOTIFICATION_CHANNEL_ID = "LiveLocation_channel_id"
+        const val NOTIFICATION_CHANNEL_NAME = "LiveLocaiton_channel_name"
+        const val NOTIFICATION_ID = 143
+
+        const val LOCATION_RECEIVED = "${BuildConfig.APPLICATION_ID}.locationreceived"
     }
 }
