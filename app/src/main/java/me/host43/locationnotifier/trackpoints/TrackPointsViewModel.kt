@@ -1,12 +1,6 @@
 package me.host43.locationnotifier.trackpoints
 
-import android.app.Activity
 import android.app.Application
-import android.app.PendingIntent
-import android.app.PendingIntent.getActivity
-import android.content.BroadcastReceiver
-import android.content.Intent
-import android.content.IntentFilter
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -14,9 +8,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.host43.locationnotifier.BuildConfig
-import me.host43.locationnotifier.LiveLocation.LiveLocationService
-import me.host43.locationnotifier.LocationReceiver.LocationBroadcastReceiver
-import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabaseDao
 
@@ -48,26 +39,26 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
         _eventStartStopService.value = state
     }
 
-    fun startStopService(checked: Boolean){
-        //it checked if started
-        val state = LiveLocationService.isServiceStarted
-        val intent = Intent(this.getApplication(), LiveLocationService::class.java)
-        val intentFilter = IntentFilter(LOCATION_RECEIVED)
-        Log.d("LiveLocationService.isStarted: ","${state}")
-        Log.d("Switch state: ","${checked}")
+    //fun startStopService(checked: Boolean){
+    //    //it checked if started
+    //    val state = LiveLocationService.isServiceStarted
+    //    val intent = Intent(this.getApplication(), LiveLocationService::class.java)
+    //    val intentFilter = IntentFilter(LOCATION_RECEIVED)
+    //    Log.d("LiveLocationService.isStarted: ","${state}")
+    //    Log.d("Switch state: ","${checked}")
 
-        val receiver = LocationBroadcastReceiver(this)
+    //    val receiver = LocationBroadcastReceiver(this)
 
-        if (!state && checked) {
-            app.registerReceiver(receiver,intentFilter,0)
-        }
-        if (state && !checked){
-            intent.action = ACTION_STOP_FOREGROUND
-        }
-        app.startService(intent)
-        Log.d("###","startService called")
-        Log.d("LiveLocationService.isStarted: ","${state}")
-    }
+    //    if (!state && checked) {
+    //        app.registerReceiver(receiver,intentFilter,0)
+    //    }
+    //    if (state && !checked){
+    //        intent.action = ACTION_STOP_FOREGROUND
+    //    }
+    //    app.startService(intent)
+    //    Log.d("###","startService called")
+    //    Log.d("LiveLocationService.isStarted: ","${state}")
+    //}
 
     fun clearAll(){
         Log.i("cleanAll","on Clean all listener")

@@ -1,13 +1,10 @@
-package me.host43.locationnotifier.LocationReceiver
+package me.host43.locationnotifier.locationreceiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.util.Log
-import androidx.lifecycle.LiveData
-import me.host43.locationnotifier.database.Point
-import me.host43.locationnotifier.database.PointDatabaseDao
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel.Companion.LOCATION_RECEIVED
 

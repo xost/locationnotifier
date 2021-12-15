@@ -1,7 +1,5 @@
 package me.host43.locationnotifier.trackpoints
 
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,11 +11,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import me.host43.locationnotifier.BuildConfig
-import me.host43.locationnotifier.LiveLocation.LiveLocationService
+import me.host43.locationnotifier.livelocation.LiveLocationService
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.databinding.FragmentTrackPointsBinding
+import me.host43.locationnotifier.util.Constants
 
 class TrackPointsFragment : Fragment() {
 
@@ -65,8 +63,15 @@ class TrackPointsFragment : Fragment() {
             }
         })
 
-        //vm.eventStartStopService.observe(viewLifecycleOwner, Observer {
-        //})
+        vm.eventStartStopService.observe(viewLifecycleOwner, Observer {
+            val intent = Intent(this.context,LiveLocationService::class.java)
+            if (it) {
+                intent.action = Constants.ACTION_START_SERVICE
+            } else {
+                intent.action = Constants.ACTION_STOP_SERVICE
+            }
+            app.startForegroundService(intent)
+        })
 
         vm.points.observe(viewLifecycleOwner, Observer {
             it?.let {

@@ -1,24 +1,22 @@
-package me.host43.locationnotifier.LiveLocation
+package me.host43.locationnotifier.livelocation
 
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.content.IntentSender
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.IBinder
 import android.os.Looper
-import android.provider.SyncStateContract
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.*
 import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.R
-import me.host43.locationnotifier.trackpoints.TrackPointsFragment
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel
 import me.host43.locationnotifier.trackpoints.TrackPointsViewModel.Companion.LOCATION_RECEIVED
+import me.host43.locationnotifier.util.Constants
 
 class LiveLocationService : Service() {
 
@@ -29,7 +27,6 @@ class LiveLocationService : Service() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
-    private var ll: Location? = null
 
     override fun onBind(p0: Intent?): IBinder? {
         //initLocationUpdates()
@@ -38,6 +35,29 @@ class LiveLocationService : Service() {
 
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        intent?.let {
+            when(it.action){
+                Constants.ACTION_START_SERVICE -> {
+                    if (!isServiceStarted) {
+                        notification = createNotification()
+                        initLocationUpdates()
+                        registerLocationUpdates()
+                        isServiceStarted = true
+                        startForeground(Constants.NOTIFICATION_ID,notification)
+                    }
+                }
+                Constants.ACTION_STOP_SERVICE -> {
+                }
+                Constants.ACTION_STOP_SERVICE -> {
+                    if (isServiceStarted){
+                        unregisterLocationUpdates()
+
+                        isServiceStarted = false
+
+                    }
+                }
+            }
+        }
         if (intent?.action != null && intent.action.equals(
                 TrackPointsViewModel.ACTION_STOP_FOREGROUND,
                 ignoreCase = true
@@ -45,28 +65,28 @@ class LiveLocationService : Service() {
         ) {
             Log.d("LiveLocationService:", "ACTION STOP")
             isServiceStarted = false
-            fusedLocationProviderClient.removeLocationUpdates(locationCallback)
 
             stopForeground(true)
             Log.d("LiveLocationService: isServiceStarted", isServiceStarted.toString())
             //stopSelf() //?????? what does it do ?
-        } else {
-            Log.d("LiveLocationService:", "ACTION START")
-            initLocationUpdates()
-            fusedLocationProviderClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper(),
-            )
-            generateForegroundNotification()
-            isServiceStarted = true
-            startForeground(1, notification)
-            Log.d("LiveLocationService: isServiceStarted", isServiceStarted.toString())
         }
         return START_NOT_STICKY // ?????????????
     }
 
-    fun generateForegroundNotification() {
+    @SuppressLint("MissingPermission")
+    fun registerLocationUpdates(){
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper(),
+        )
+    }
+
+    fun unregisterLocationUpdates(){
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
+    fun createNotification(): Notification {
         Log.i("DEBUG", "start requset location")
         val intentMainLanding = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, intentMainLanding, 0)
