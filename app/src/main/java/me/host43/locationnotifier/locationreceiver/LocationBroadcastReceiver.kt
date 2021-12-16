@@ -24,6 +24,5 @@ class LocationBroadcastReceiver(private val vm: TrackPointsViewModel): Broadcast
             Log.d("LocationBroadcastReceiver",
                 "point name: ${it.name}")
         }
-        vm.logAllPoints()
     }
 }

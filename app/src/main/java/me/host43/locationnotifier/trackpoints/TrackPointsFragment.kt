@@ -2,7 +2,6 @@ package me.host43.locationnotifier.trackpoints
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +15,7 @@ import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.databinding.FragmentTrackPointsBinding
 import me.host43.locationnotifier.util.Constants
+import timber.log.Timber
 
 class TrackPointsFragment : Fragment() {
 
@@ -38,7 +38,7 @@ class TrackPointsFragment : Fragment() {
         //b.lifecycleOwner = this
         b.vm = vm
 
-        b.goButton.isChecked = LiveLocationService.isServiceStarted
+        //b.goButton.isChecked = vm.serviceState.value == true
 
         val adapter = PointAdapter()
         b.pointList.adapter = adapter
@@ -52,14 +52,24 @@ class TrackPointsFragment : Fragment() {
             }
         })
 
-        vm.eventStartStopService.observe(viewLifecycleOwner, Observer {
-            val intent = Intent(this.context, LiveLocationService::class.java)
+        vm.eventStartService.observe(viewLifecycleOwner, Observer {
             if (it) {
-                intent.action = Constants.ACTION_START_SERVICE
-            } else {
-                intent.action = Constants.ACTION_STOP_SERVICE
+                val intent = Intent(context, LiveLocationService::class.java).apply {
+                    action = Constants.ACTION_START_SERVICE
+                }
+                app.startForegroundService(intent)
+                vm.startServiceDone()
             }
-            app.startForegroundService(intent)
+        })
+
+        vm.eventStopService.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                val intent = Intent(context, LiveLocationService::class.java).apply {
+                    action = Constants.ACTION_STOP_SERVICE
+                }
+                app.startForegroundService(intent)
+                vm.stopServiceDone()
+            }
         })
 
         vm.points.observe(viewLifecycleOwner, Observer {

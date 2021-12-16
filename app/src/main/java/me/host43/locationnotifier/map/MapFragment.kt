@@ -43,7 +43,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val vmf = MapViewModelFactory(ds, app)
         vm = ViewModelProvider(this, vmf).get(MapViewModel::class.java)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         b.lifecycleOwner = this
         b.vm = vm

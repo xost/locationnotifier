@@ -10,8 +10,12 @@ import kotlinx.coroutines.launch
 import me.host43.locationnotifier.BuildConfig
 import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabaseDao
+import timber.log.Timber
 
-class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Application) : AndroidViewModel(app) {
+class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Application) :
+    AndroidViewModel(app) {
+
+    var points = db.getAllPoints()
 
     private val _eventAddPoint = MutableLiveData<Boolean>()
     val eventAddPoint: LiveData<Boolean>
@@ -21,11 +25,17 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
     val eventAddPointDone: LiveData<Boolean>
         get() = _eventAddPointDone
 
-    private val _eventStartStopService = MutableLiveData<Boolean>(false)
-    val eventStartStopService: LiveData<Boolean>
-        get() = _eventStartStopService
+    private val _serviceState = MutableLiveData<Boolean>(false)
+    val serviceState: LiveData<Boolean>
+        get() = _serviceState
 
-    var points = db.getAllPoints()
+    private val _eventStartService = MutableLiveData<Boolean>()
+    val eventStartService: LiveData<Boolean>
+        get() = _eventStartService
+
+    private val _eventStopService = MutableLiveData<Boolean>()
+    val eventStopService: LiveData<Boolean>
+        get() = _eventStopService
 
     fun onAddButton() {
         _eventAddPoint.value = true
@@ -35,24 +45,32 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
         _eventAddPoint.value = false
     }
 
-    fun eventServiceStateChanged(state: Boolean){
-        _eventStartStopService.value = state
-    }
-
-    fun clearAll(){
-        Log.i("cleanAll","on Clean all listener")
-        viewModelScope.launch{
+    fun clearAll() {
+        viewModelScope.launch {
             db.clear()
         }
     }
 
-    fun getAllPoints() : List<Point>? {
-        return db.getAllPoints().value
+    fun eventServiceStateChanged(checked: Boolean){
+        if (checked && serviceState.value==false) {
+            _eventStartService.value=true
+            _serviceState.value=true
+        }
+        if (!checked && serviceState.value==true){
+            _eventStopService.value=true
+            _serviceState.value=false
+        }
     }
 
-    fun logAllPoints(){
-        points.value?.forEach{
-            Log.d("TrackPointsViewModel","${it.name}")
-        }
+    fun startServiceDone(){
+        _eventStartService.value=false
+    }
+
+    fun stopServiceDone(){
+        _eventStartService.value=false
+    }
+
+    fun getAllPoints(): List<Point>? {
+        return db.getAllPoints().value
     }
 }

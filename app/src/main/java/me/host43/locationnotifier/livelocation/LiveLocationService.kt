@@ -8,7 +8,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.LiveData
@@ -19,6 +18,7 @@ import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.database.PointDatabaseDao
 import me.host43.locationnotifier.util.Constants
+import timber.log.Timber
 
 class LiveLocationService : LifecycleService() {
 
@@ -31,19 +31,13 @@ class LiveLocationService : LifecycleService() {
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
 
-    private val ds :PointDatabaseDao = PointDatabase.getInstance(this).dao
-    private var points = ds.getAllPoints()
+    private lateinit var  ds: PointDatabaseDao
+    private lateinit var points: LiveData<List<me.host43.locationnotifier.database.Point>>
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("LiveLocationService",ds.getAllPoints().value.toString())
-
-        points.observe(this, Observer {
-            Log.d("LiveLocationsService","Points are changed")
-            it.forEach{
-                Log.d("LiveLocationService",it.name)
-            }
-        })
+        ds = PointDatabase.getInstance(this).dao
+        points = ds.getAllPoints()
     }
 
     @SuppressLint("MissingPermission")
@@ -53,6 +47,7 @@ class LiveLocationService : LifecycleService() {
             when (it.action) {
                 Constants.ACTION_START_SERVICE -> {
                     if (!isServiceStarted) {
+                        Timber.d("START SERVICE")
                         notification = createNotification()
                         initLocationUpdates()
                         registerLocationUpdates()
@@ -62,6 +57,7 @@ class LiveLocationService : LifecycleService() {
                 }
                 Constants.ACTION_STOP_SERVICE -> {
                     if (isServiceStarted) {
+                        Timber.d("STOP SERVICE")
                         notificationManager.cancel(Constants.NOTIFICATION_ID)
                         unregisterLocationUpdates()
                         isServiceStarted = false
@@ -91,7 +87,7 @@ class LiveLocationService : LifecycleService() {
     fun createNotification(): Notification {
         val intentMainLanding = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, intentMainLanding, 0)
-        val iconNotification = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+        //val iconNotification = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
         notificationManager =
             this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannelGroup(
@@ -108,7 +104,7 @@ class LiveLocationService : LifecycleService() {
         notificationChannel.description = "channel for service's notifications"
         notificationChannel.enableLights(false)
         notificationChannel.lockscreenVisibility = Notification.VISIBILITY_SECRET
-        notificationChannel.group = "notifications_group_id"
+        notificationChannel.group = "notification_group_id"
         notificationManager.createNotificationChannel(notificationChannel)
 
         builder = NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID)
@@ -127,9 +123,9 @@ class LiveLocationService : LifecycleService() {
             .setOnlyAlertOnce(true)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
-        iconNotification?.let {
-            builder.setLargeIcon(Bitmap.createScaledBitmap(iconNotification, 128, 128, false))
-        }
+        //iconNotification?.let {
+        //    builder.setLargeIcon(Bitmap.createScaledBitmap(iconNotification, 128, 128, false))
+        //}
         builder.color = resources.getColor(R.color.purple_200)
         notification = builder.build()
         return notification
@@ -157,10 +153,15 @@ class LiveLocationService : LifecycleService() {
                 //intent.putExtra("lastLocation", p0.lastLocation)
                 //sendBroadcast(intent)
                 points.value?.forEach {
-                    Log.d("LiveLocationService: locationCallback","point name: ${it.name}")
+                    Timber.d("point name: ${it.name}")
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.d("DESTROYED")
     }
 
     companion object {
