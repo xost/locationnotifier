@@ -64,15 +64,15 @@ class LiveLocationService : LifecycleService() {
                     if (isServiceStarted) {
                         notificationManager.cancel(Constants.NOTIFICATION_ID)
                         unregisterLocationUpdates()
+                        isServiceStarted = false
                         stopForeground(true)
                         stopSelf()
-                        isServiceStarted = false
 
                     }
                 }
             }
         }
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     @SuppressLint("MissingPermission")

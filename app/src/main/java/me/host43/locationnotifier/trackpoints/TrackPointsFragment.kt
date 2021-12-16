@@ -32,14 +32,13 @@ class TrackPointsFragment : Fragment() {
 
         val app = requireNotNull(this.activity).application
         val ds = PointDatabase.getInstance(app).dao
-        Log.d("TrackPointsFragment",ds.getAllPoints().value.toString())
         val vmFactory = TrackPointsViewModelFactory(ds, app)
         val vm = ViewModelProvider(this, vmFactory).get(TrackPointsViewModel::class.java)
 
-        b.lifecycleOwner = this
+        //b.lifecycleOwner = this
         b.vm = vm
 
-       b.goButton.isChecked = LiveLocationService.isServiceStarted
+        b.goButton.isChecked = LiveLocationService.isServiceStarted
 
         val adapter = PointAdapter()
         b.pointList.adapter = adapter
@@ -47,7 +46,6 @@ class TrackPointsFragment : Fragment() {
         vm.eventAddPoint.observe(viewLifecycleOwner, Observer {
             if (it) {
                 this.findNavController().navigate(
-                    //TrackPointsFragmentDirections.actionTrackPointsFragmentToInputPointFragment()
                     TrackPointsFragmentDirections.actionTrackPointsFragmentToMapFragment()
                 )
                 vm.navigationComplete()
@@ -55,7 +53,7 @@ class TrackPointsFragment : Fragment() {
         })
 
         vm.eventStartStopService.observe(viewLifecycleOwner, Observer {
-            val intent = Intent(this.context,LiveLocationService::class.java)
+            val intent = Intent(this.context, LiveLocationService::class.java)
             if (it) {
                 intent.action = Constants.ACTION_START_SERVICE
             } else {
