@@ -39,6 +39,7 @@ class LiveLocationService : LifecycleService() {
         Log.d("LiveLocationService",ds.getAllPoints().value.toString())
 
         points.observe(this, Observer {
+            Log.d("LiveLocationsService","Points are changed")
             it.forEach{
                 Log.d("LiveLocationService",it.name)
             }
