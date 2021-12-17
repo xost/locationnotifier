@@ -1,6 +1,8 @@
 package me.host43.locationnotifier.trackpoints
 
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -35,10 +37,13 @@ class TrackPointsFragment : Fragment() {
         val vmFactory = TrackPointsViewModelFactory(ds, app)
         val vm = ViewModelProvider(this, vmFactory).get(TrackPointsViewModel::class.java)
 
-        //b.lifecycleOwner = this
+        b.lifecycleOwner = this
         b.vm = vm
 
-        //b.goButton.isChecked = vm.serviceState.value == true
+        Timber.d("vm.serviceState=${vm.serviceState}")
+        val prefs=app.getSharedPreferences("TrackPointsFragment",MODE_PRIVATE)
+        val state = prefs.getBoolean("serviceState",false)
+        b.goButton.isChecked = state
 
         val adapter = PointAdapter()
         b.pointList.adapter = adapter
@@ -54,22 +59,28 @@ class TrackPointsFragment : Fragment() {
 
         vm.eventStartService.observe(viewLifecycleOwner, Observer {
             if (it) {
+                vm.startServiceDone()
                 val intent = Intent(context, LiveLocationService::class.java).apply {
                     action = Constants.ACTION_START_SERVICE
                 }
                 app.startForegroundService(intent)
-                vm.startServiceDone()
             }
         })
 
         vm.eventStopService.observe(viewLifecycleOwner, Observer {
             if (it) {
+                vm.stopServiceDone()
                 val intent = Intent(context, LiveLocationService::class.java).apply {
                     action = Constants.ACTION_STOP_SERVICE
                 }
                 app.startForegroundService(intent)
-                vm.stopServiceDone()
             }
+        })
+
+        vm.serviceState.observe(viewLifecycleOwner, Observer {
+            val prefs = app.getSharedPreferences("TrackPointsFragment", MODE_PRIVATE).edit()
+            prefs.putBoolean("serviceState",it)
+            prefs.commit()
         })
 
         vm.points.observe(viewLifecycleOwner, Observer {

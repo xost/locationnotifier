@@ -44,7 +44,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/onoff_text"
-            android:checked="@{vm.serviceState}"
             android:onCheckedChanged="@{(switch,checked) -> vm.eventServiceStateChanged(checked)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
