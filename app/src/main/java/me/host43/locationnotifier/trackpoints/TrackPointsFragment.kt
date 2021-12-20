@@ -1,5 +1,7 @@
 package me.host43.locationnotifier.trackpoints
 
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
@@ -40,10 +42,7 @@ class TrackPointsFragment : Fragment() {
         b.lifecycleOwner = this
         b.vm = vm
 
-        Timber.d("vm.serviceState=${vm.serviceState}")
-        val prefs=app.getSharedPreferences("TrackPointsFragment",MODE_PRIVATE)
-        val state = prefs.getBoolean("serviceState",false)
-        b.goButton.isChecked = state
+        b.goButton.isChecked = LiveLocationService.isServiceStarted
 
         val adapter = PointAdapter()
         b.pointList.adapter = adapter
@@ -63,6 +62,7 @@ class TrackPointsFragment : Fragment() {
                 val intent = Intent(context, LiveLocationService::class.java).apply {
                     action = Constants.ACTION_START_SERVICE
                 }
+                val pi = PendingIntent.getActivity(this,0,,0)
                 app.startForegroundService(intent)
             }
         })
@@ -75,12 +75,6 @@ class TrackPointsFragment : Fragment() {
                 }
                 app.startForegroundService(intent)
             }
-        })
-
-        vm.serviceState.observe(viewLifecycleOwner, Observer {
-            val prefs = app.getSharedPreferences("TrackPointsFragment", MODE_PRIVATE).edit()
-            prefs.putBoolean("serviceState",it)
-            prefs.commit()
         })
 
         vm.points.observe(viewLifecycleOwner, Observer {

@@ -4,17 +4,17 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Point
+import android.location.Location
+import android.os.Binder
+import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import com.google.android.gms.location.*
 import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.R
+import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.database.PointDatabaseDao
 import me.host43.locationnotifier.util.Constants
@@ -31,7 +31,7 @@ class LiveLocationService : LifecycleService() {
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
 
-    private lateinit var  ds: PointDatabaseDao
+    private lateinit var ds: PointDatabaseDao
     private lateinit var points: LiveData<List<me.host43.locationnotifier.database.Point>>
 
     override fun onCreate() {
@@ -68,7 +68,7 @@ class LiveLocationService : LifecycleService() {
                 }
             }
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     @SuppressLint("MissingPermission")
@@ -148,20 +148,22 @@ class LiveLocationService : LifecycleService() {
                     builder.setContentText("latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
                         .build()
                 notificationManager.notify(Constants.NOTIFICATION_ID, notification)
-                //val intent = Intent()
-                //intent.action = Constants.LOCATION_RECEIVED
-                //intent.putExtra("lastLocation", p0.lastLocation)
-                //sendBroadcast(intent)
-                points.value?.forEach {
-                    Timber.d("point name: ${it.name}")
-                }
             }
+            val alarmPoints = getAlarmPoints()
+
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Timber.d("DESTROYED")
+    }
+
+    fun getAlarmPoints(): List<Point>?{
+        points.value?.forEach {
+            Timber.d("point name ${it.name}")
+        }
+        return points.value
     }
 
     companion object {
