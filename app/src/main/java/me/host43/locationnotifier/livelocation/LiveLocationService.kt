@@ -31,6 +31,8 @@ class LiveLocationService : LifecycleService() {
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
 
+    private var pi: PendingIntent? = null
+
     private lateinit var ds: PointDatabaseDao
     private lateinit var points: LiveData<List<me.host43.locationnotifier.database.Point>>
 
@@ -51,6 +53,7 @@ class LiveLocationService : LifecycleService() {
                         notification = createNotification()
                         initLocationUpdates()
                         registerLocationUpdates()
+                        pi = intent.getParcelableExtra<PendingIntent>("pendingIntent")
                         isServiceStarted = true
                         startForeground(Constants.NOTIFICATION_ID, notification)
                     }
@@ -148,9 +151,9 @@ class LiveLocationService : LifecycleService() {
                     builder.setContentText("latitude: ${ll.latitude}, longtitude: ${ll.longitude}")
                         .build()
                 notificationManager.notify(Constants.NOTIFICATION_ID, notification)
+                val alarmPoints = getAlarmPoints()
+                startActivity1()
             }
-            val alarmPoints = getAlarmPoints()
-
         }
     }
 
@@ -159,11 +162,18 @@ class LiveLocationService : LifecycleService() {
         Timber.d("DESTROYED")
     }
 
-    fun getAlarmPoints(): List<Point>?{
+    private fun getAlarmPoints(): List<Point>? {
         points.value?.forEach {
             Timber.d("point name ${it.name}")
         }
         return points.value
+    }
+
+    private fun startActivity1() {
+        pi?.let {
+            Timber.d("trying to start ACTIVITY")
+            it.send()
+        }
     }
 
     companion object {

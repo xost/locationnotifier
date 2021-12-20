@@ -21,10 +21,6 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
     val eventAddPoint: LiveData<Boolean>
         get() = _eventAddPoint
 
-    //private val _serviceState = MutableLiveData<Boolean>()
-    //val serviceState: LiveData<Boolean>
-    //    get() = _serviceState
-
     private val _eventStartService = MutableLiveData<Boolean>()
     val eventStartService: LiveData<Boolean>
         get() = _eventStartService
@@ -34,9 +30,6 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
         get() = _eventStopService
 
     init {
-        //val prefs = app.getSharedPreferences("TrackPointsFragment", Context.MODE_PRIVATE)
-        //val state = prefs.getBoolean("serviceState",false)
-        //_serviceState.value = LiveLocationService.isServiceStarted
         points = db.getAllPoints()
     }
 

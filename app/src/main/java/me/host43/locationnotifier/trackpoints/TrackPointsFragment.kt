@@ -2,6 +2,7 @@ package me.host43.locationnotifier.trackpoints
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
@@ -14,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.livelocation.LiveLocationService
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
@@ -39,7 +41,7 @@ class TrackPointsFragment : Fragment() {
         val vmFactory = TrackPointsViewModelFactory(ds, app)
         val vm = ViewModelProvider(this, vmFactory).get(TrackPointsViewModel::class.java)
 
-        b.lifecycleOwner = this
+        //b.lifecycleOwner = this
         b.vm = vm
 
         b.goButton.isChecked = LiveLocationService.isServiceStarted
@@ -62,7 +64,8 @@ class TrackPointsFragment : Fragment() {
                 val intent = Intent(context, LiveLocationService::class.java).apply {
                     action = Constants.ACTION_START_SERVICE
                 }
-                val pi = PendingIntent.getActivity(this,0,,0)
+                val pi = PendingIntent.getActivity(context,0,Intent(context,MainActivity::class.java),0)
+                intent.putExtra("pendingIntent",pi)
                 app.startForegroundService(intent)
             }
         })
@@ -84,5 +87,4 @@ class TrackPointsFragment : Fragment() {
         })
         return b.root
     }
-
 }
