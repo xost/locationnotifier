@@ -17,6 +17,7 @@ class Constants {
 
         const val ALARM_NOTIFICATION_CHANNEL_ID = "${BuildConfig.APPLICATION_ID}.location_alarm_channel_id"
         const val ALARM_NOTIFICATION_CHANNEL_NAME = "${BuildConfig.APPLICATION_ID}.location_alarm_channel_name"
+        const val ALARM_NOTIFICATION_ID = NOTIFICATION_ID+1
 
         const val LOCATION_RECEIVED = "${BuildConfig.APPLICATION_ID}.locationreceived"
         const val LOCATION_ALARM_FILTER = "${BuildConfig.APPLICATION_ID}.location_alarm_filter"

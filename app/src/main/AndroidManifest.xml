@@ -14,20 +14,27 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LocationNotifier">
+        <activity
+            android:name=".AlarmActivity"
+            android:exported="true" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".livelocation.LiveLocationService"/>
-        <receiver android:name=".locationreceiver.LocationBroadcastReceiver">
-        </receiver>
+
+        <service android:name=".livelocation.LiveLocationService" />
+
+        <receiver android:name=".locationreceiver.LocationBroadcastReceiver"></receiver>
     </application>
 
 </manifest>

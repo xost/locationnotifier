@@ -181,8 +181,6 @@ class LiveLocationService : LifecycleService() {
                 intent.action=Constants.LOCATION_ALARM_FILTER
                 intent.putExtra("alarmPoints","alarm message")
                 applicationContext.sendBroadcast(intent)
-                //alarmNotification = getAlarmNotification()
-                //notificationManager.notify(Constants.NOTIFICATION_ID+1,alarmNotification)
             }
         ;}
     }
@@ -213,7 +211,7 @@ class LiveLocationService : LifecycleService() {
         val alarmNotificationChannel = NotificationChannel(
             Constants.ALARM_NOTIFICATION_CHANNEL_ID,
             Constants.ALARM_NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_HIGH
+            NotificationManager.IMPORTANCE_LOW
         )
         notificationChannel.description = "alarm notifications"
         notificationChannel.enableLights(true)
