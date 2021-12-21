@@ -2,8 +2,10 @@ package me.host43.locationnotifier.livelocation
 
 import android.annotation.SuppressLint
 import android.app.*
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.Location
 import android.os.Binder
 import android.os.IBinder
@@ -11,12 +13,14 @@ import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.LiveData
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.*
 import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.database.PointDatabaseDao
+import me.host43.locationnotifier.locationreceiver.LocationBroadcastReceiver
 import me.host43.locationnotifier.util.Constants
 import timber.log.Timber
 
@@ -31,6 +35,8 @@ class LiveLocationService : LifecycleService() {
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
 
+    private lateinit var alarmBCReceiver: BroadcastReceiver
+
     private var pi: PendingIntent? = null
 
     private lateinit var ds: PointDatabaseDao
@@ -40,6 +46,8 @@ class LiveLocationService : LifecycleService() {
         super.onCreate()
         ds = PointDatabase.getInstance(this).dao
         points = ds.getAllPoints()
+        alarmBCReceiver = LocationBroadcastReceiver()
+        registerBCReceiver()
     }
 
     @SuppressLint("MissingPermission")
@@ -136,15 +144,16 @@ class LiveLocationService : LifecycleService() {
 
     private fun initLocationUpdates() {
         locationRequest = LocationRequest.create().apply {
-            interval = 2000
-            fastestInterval = 1000
-            maxWaitTime = 2000 * 60
-            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+            interval = 1000
+            fastestInterval = 500
+            maxWaitTime = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(this)
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
+                Timber.d("got location update")
                 super.onLocationResult(p0)
                 val ll = p0.lastLocation //ll - last location
                 notification =
@@ -152,14 +161,11 @@ class LiveLocationService : LifecycleService() {
                         .build()
                 notificationManager.notify(Constants.NOTIFICATION_ID, notification)
                 val alarmPoints = getAlarmPoints()
-                startActivity1()
+                val alarmIntent = Intent(Constants.LOCATION_ALARM_FILTER)
+                alarmIntent.putExtra("alarmPoints", alarmPoints?.toTypedArray())
+                LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(alarmIntent)
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Timber.d("DESTROYED")
     }
 
     private fun getAlarmPoints(): List<Point>? {
@@ -169,11 +175,17 @@ class LiveLocationService : LifecycleService() {
         return points.value
     }
 
-    private fun startActivity1() {
-        pi?.let {
-            Timber.d("trying to start ACTIVITY")
-            it.send()
-        }
+    private fun registerBCReceiver() {
+        LocalBroadcastManager.getInstance(applicationContext).registerReceiver(
+            alarmBCReceiver,
+            IntentFilter(Constants.LOCATION_ALARM_FILTER)
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(alarmBCReceiver)
+        Timber.d("DESTROYED")
     }
 
     companion object {

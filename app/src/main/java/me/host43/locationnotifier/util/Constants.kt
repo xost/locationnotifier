@@ -13,5 +13,6 @@ class Constants {
         const val NOTIFICATION_ID = 143
 
         const val LOCATION_RECEIVED = "${BuildConfig.APPLICATION_ID}.locationreceived"
+        const val LOCATION_ALARM_FILTER = "${BuildConfig.APPLICATION_ID}.location_alarm_filter"
     }
 }
