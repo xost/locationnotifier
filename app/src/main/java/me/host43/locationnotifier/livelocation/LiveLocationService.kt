@@ -162,17 +162,17 @@ class LiveLocationService : LifecycleService() {
                 notificationManager.notify(Constants.NOTIFICATION_ID, notification)
                 val alarmPoints = getAlarmPoints()
                 val alarmIntent = Intent(Constants.LOCATION_ALARM_FILTER)
-                alarmIntent.putExtra("alarmPoints", alarmPoints?.toTypedArray())
+                alarmIntent.putExtra("alarmPoints", alarmPoints.?.toTypedArray())
                 LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(alarmIntent)
             }
         }
     }
 
-    private fun getAlarmPoints(): List<Point>? {
+    private fun getAlarmPoints(): Array<Point> {
         points.value?.forEach {
             Timber.d("point name ${it.name}")
         }
-        return points.value
+        return points.value.toTypedArray<Point>()
     }
 
     private fun registerBCReceiver() {
