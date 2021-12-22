@@ -1,43 +1,76 @@
 package me.host43.locationnotifier.locationreceiver
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.res.TypedArray
-import android.location.Location
 import androidx.core.app.NotificationCompat
-import me.host43.locationnotifier.AlarmActivity
 import me.host43.locationnotifier.MainActivity
-import me.host43.locationnotifier.database.Point
-import me.host43.locationnotifier.trackpoints.TrackPointsViewModel
+import me.host43.locationnotifier.R
 import me.host43.locationnotifier.util.Constants
 import timber.log.Timber
 
 class LocationBroadcastReceiver : BroadcastReceiver() {
 
     private lateinit var notificationManager: NotificationManager
-    private lateinit var notificationChannel: NotificationChannel
-    private lateinit var notification: Notification
 
-    override fun onReceive(p0: Context?, p1: Intent?) {
-        val alarmPoints = p1?.getStringExtra("alarmPoints")
-        Timber.d(alarmPoints)
+    override fun onReceive(ctx: Context?, i: Intent?) {
+        val alarmPoints = i?.getStringExtra("alarmPoints")
+        ctx?.apply {
+            notificationManager =
+                ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.apply {
+                createNotificationChannelGroup(
+                    NotificationChannelGroup(
+                        Constants.ALARM_NOTIFICATION_GROUP_ID,
+                        Constants.ALARM_NOTIFICATION_GROUP_NAME
+                    )
+                )
+            }
+            notificationManager.createNotificationChannel(createNotificationChannel())
+            notificationManager.notify(
+                Constants.ALARM_NOTIFICATION_ID,
+                createNotification(
+                    this, Constants.ALARM_NOTIFICATION_CHANNEL_ID,
+                    alarmPoints.toString()
+                )
+            )
+        }
     }
 
-
-    private fun createNotification(): Notification {
-        notificationChannel = NotificationChannel(
+    private fun createNotificationChannel(): NotificationChannel {
+        val notificationChannel = NotificationChannel(
             Constants.ALARM_NOTIFICATION_CHANNEL_ID,
             Constants.ALARM_NOTIFICATION_CHANNEL_NAME,
             NotificationManager.IMPORTANCE_LOW
-        )
-        notificationChannel.description = "alarm notifications"
-        notificationChannel.enableLights(false)
-        notificationChannel.lockscreenVisibility = Notification.VISIBILITY_SECRET
-        notificationChannel.group = Constants.NOTIFICATION_GROUP_ID
-        notificationManager.createNotificationChannel(notificationChannel)
+        ).apply {
+            description = "alarm notifications"
+            enableLights(false)
+            lockscreenVisibility = Notification.VISIBILITY_SECRET
+            group = Constants.ALARM_NOTIFICATION_GROUP_ID
+        }
+        return notificationChannel
+    }
+
+    private fun createNotification(ctx: Context, channelId: String, message: String): Notification {
+        val intent = Intent(ctx, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(ctx, 0, intent, 0)
+        val notificationBuilder = NotificationCompat.Builder(ctx, channelId).apply {
+            setContentTitle("${R.string.app_name} - ${Companion.CONTENT_TITLE_TEXT}")
+            setTicker("${R.string.app_name} - ${Companion.CONTENT_TITLE_TEXT}")
+            setContentText(message)
+            setSmallIcon(android.R.drawable.ic_dialog_alert)
+            setAutoCancel(true)
+            setOngoing(true)
+            setWhen(0)
+            setOnlyAlertOnce(true)
+            setContentIntent(pendingIntent)
+            priority = NotificationCompat.PRIORITY_LOW
+        }
+        return notificationBuilder.build()
+    }
+
+    companion object {
+        private const val CONTENT_TITLE_TEXT = "Inside the zone"
     }
 }
