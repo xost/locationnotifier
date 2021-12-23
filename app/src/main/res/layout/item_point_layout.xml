@@ -90,8 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:text="@string/onoff_text"
-            android:textOff="off"
-            android:textOn="on"
+            android:checked="@={point.enabled}"
             app:layout_constraintBottom_toBottomOf="@+id/distance_text_view"
             app:layout_constraintEnd_toEndOf="parent" />
 

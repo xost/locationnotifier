@@ -28,6 +28,7 @@ import me.host43.locationnotifier.database.PointDatabaseDao
 import me.host43.locationnotifier.locationreceiver.LocationBroadcastReceiver
 import me.host43.locationnotifier.util.Constants
 import timber.log.Timber
+import java.io.Serializable
 import java.sql.Time
 
 class LiveLocationService : LifecycleService() {
@@ -42,15 +43,13 @@ class LiveLocationService : LifecycleService() {
     private lateinit var locationCallback: LocationCallback
 
     private lateinit var alarmBCReceiver: BroadcastReceiver
-    private lateinit var alarmNotification: Notification
 
-    private lateinit var ds: PointDatabaseDao
     private lateinit var points: LiveData<List<Point>>
     private val staticPoints = mutableListOf<Point>()
 
     override fun onCreate() {
         super.onCreate()
-        ds = PointDatabase.getInstance(this).dao
+        val ds = PointDatabase.getInstance(this).dao
         points = ds.getAllPoints()
         alarmBCReceiver = LocationBroadcastReceiver()
         registerBCReceiver()
@@ -59,12 +58,13 @@ class LiveLocationService : LifecycleService() {
             staticPoints.removeAll(staticPoints)
             Timber.d("Lenght of staticPoints = ${staticPoints.size}")
             it.forEach {
-                staticPoints += it
+                if (it.enabled) {
+                    staticPoints += it
+                }
             }
         })
     }
 
-    @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         intent?.let {
@@ -96,7 +96,7 @@ class LiveLocationService : LifecycleService() {
     }
 
     @SuppressLint("MissingPermission")
-    fun registerLocationUpdates() {
+    private fun registerLocationUpdates() {
         fusedLocationProviderClient.requestLocationUpdates(
             locationRequest,
             locationCallback,
@@ -104,11 +104,11 @@ class LiveLocationService : LifecycleService() {
         )
     }
 
-    fun unregisterLocationUpdates() {
+    private fun unregisterLocationUpdates() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
-    fun createNotification(): Notification {
+    private fun createNotification(): Notification {
         val intentMainLanding = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, intentMainLanding, 0)
         val iconNotification = BitmapFactory.decodeResource(
@@ -177,12 +177,25 @@ class LiveLocationService : LifecycleService() {
                         .build()
                 notificationManager.notify(Constants.NOTIFICATION_ID, notification)
 
-                val intent = Intent(applicationContext,LocationBroadcastReceiver::class.java)
-                intent.action=Constants.LOCATION_ALARM_FILTER
-                intent.putExtra("alarmPoints","alarm message")
+                val intent = Intent(applicationContext, LocationBroadcastReceiver::class.java)
+                intent.action = Constants.LOCATION_ALARM_FILTER
+                val alarmPoints = mutableListOf<Point>()
+                staticPoints.forEach {
+                    val pl = Location("").apply {
+                        latitude = it.latitude
+                        longitude = it.longitude
+                    }
+                    val distance = ll.distanceTo(pl)
+                    Timber.d("distance is: $distance")
+                    if (distance <= it.distance) {
+                        alarmPoints.add(it)
+                    }
+                }
+                intent.putExtra("alarmPoints", alarmPoints as Serializable)
                 applicationContext.sendBroadcast(intent)
             }
-        ;}
+            ;
+        }
     }
 
     private fun getAlarmPoints(): List<Point>? {
@@ -205,44 +218,6 @@ class LiveLocationService : LifecycleService() {
         LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(alarmBCReceiver)
         //notificationManager.cancel(Constants.NOTIFICATION_ID+1)
         Timber.d("DESTROYED")
-    }
-
-    fun getAlarmNotification(): Notification {
-        val alarmNotificationChannel = NotificationChannel(
-            Constants.ALARM_NOTIFICATION_CHANNEL_ID,
-            Constants.ALARM_NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_LOW
-        )
-        notificationChannel.description = "alarm notifications"
-        notificationChannel.enableLights(true)
-        notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        notificationChannel.group = Constants.NOTIFICATION_GROUP_ID
-        notificationManager.createNotificationChannel(notificationChannel)
-
-        val pendingIntent =
-            PendingIntent.getActivity(
-                this,
-                0,
-                Intent(this, MainActivity::class.java),
-                0
-            )
-
-        val alarmBuilder =
-            NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID).apply {
-                setContentTitle(
-                    StringBuilder("LocationNotifier").append("location ALARM").toString()
-                )
-                setTicker("Ticker")
-                setContentText("FUCK")
-                setPriority(NotificationCompat.PRIORITY_LOW)
-                setWhen(0)
-                setOnlyAlertOnce(true)
-                setContentIntent(pendingIntent)
-                setOngoing(true)
-                setSmallIcon(R.drawable.ic_launcher_foreground)
-                addAction(R.drawable.ic_launcher_foreground,"open app",pendingIntent)
-            }
-        return alarmBuilder.build()
     }
 
     companion object {

@@ -7,16 +7,36 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.R
+import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.util.Constants
 import timber.log.Timber
+import java.lang.StringBuilder
 
 class LocationBroadcastReceiver : BroadcastReceiver() {
 
     private lateinit var notificationManager: NotificationManager
 
     override fun onReceive(ctx: Context?, i: Intent?) {
-        val alarmPoints = i?.getStringExtra("alarmPoints")
-        ctx?.apply {
+        val alarmPoints = i?.getSerializableExtra("alarmPoints") as List<Point>
+        if (alarmPoints.isEmpty()) {
+            Timber.d("alarm points is empty")
+        } else {
+            Timber.d(alarmPoints.toString())
+            ctx?.let { notify(it, makeAlarmMessage(alarmPoints)) }
+        }
+    }
+
+    private fun makeAlarmMessage(alarmPoints: List<Point>): String {
+        StringBuilder("You are inside the zone of: ").apply {
+            alarmPoints.forEach {
+                append(it.name).append("\n")
+            }
+            return toString()
+        }
+    }
+
+    private fun notify(ctx: Context, msg: String) {
+        ctx.apply {
             notificationManager =
                 ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.apply {
@@ -32,7 +52,7 @@ class LocationBroadcastReceiver : BroadcastReceiver() {
                 Constants.ALARM_NOTIFICATION_ID,
                 createNotification(
                     this, Constants.ALARM_NOTIFICATION_CHANNEL_ID,
-                    alarmPoints.toString()
+                    msg
                 )
             )
         }

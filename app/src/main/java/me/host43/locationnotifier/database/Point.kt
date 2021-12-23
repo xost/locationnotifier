@@ -11,9 +11,10 @@ import androidx.databinding.InverseBindingAdapter
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "points_table")
-class Point {
+class Point: Serializable {
     @PrimaryKey(autoGenerate = true)
     var pointId: Long = 0L
 

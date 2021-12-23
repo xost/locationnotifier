@@ -71,7 +71,7 @@ class TrackPointsFragment : Fragment() {
         vm.eventStartService.observe(viewLifecycleOwner, Observer {
             if (it) {
                 vm.startServiceDone()
-                val intent = Intent(context, LiveLocationService::class.java).apply {
+                val intent = Intent(app, LiveLocationService::class.java).apply {
                     action = Constants.ACTION_START_SERVICE
                 }
                 val pi = PendingIntent.getActivity(
@@ -88,7 +88,7 @@ class TrackPointsFragment : Fragment() {
         vm.eventStopService.observe(viewLifecycleOwner, Observer {
             if (it) {
                 vm.stopServiceDone()
-                val intent = Intent(context, LiveLocationService::class.java).apply {
+                val intent = Intent(app, LiveLocationService::class.java).apply {
                     action = Constants.ACTION_STOP_SERVICE
                 }
                 app.startForegroundService(intent)
