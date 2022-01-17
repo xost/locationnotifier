@@ -29,6 +29,10 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
     val eventStopService: LiveData<Boolean>
         get() = _eventStopService
 
+    private val _switchPointEvent = MutableLiveData<Long>()
+    val switchPointEvent: LiveData<Long>
+        get() = _switchPointEvent
+
     init {
         points = db.getAllPoints()
     }
@@ -63,6 +67,19 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
     fun stopServiceDone() {
         _eventStartService.value = false
     }
+
+    fun switchPoint(id: Long) {
+        viewModelScope.launch {
+            val point = db.get(id)
+            point.enabled=!point.enabled
+            db.update(point)
+            Timber.d("point set to: ${point.enabled}")
+        }
+    }
+
+    //fun switchPointDone(id: Long){
+    //    _switchPointEvent.value=null
+    //}
 
     fun getAllPoints(): List<Point>? {
         return db.getAllPoints().value

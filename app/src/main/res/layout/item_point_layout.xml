@@ -8,11 +8,18 @@
         <variable
             name="point"
             type="me.host43.locationnotifier.database.Point" />
+        <variable
+            name="clickListener"
+            type="me.host43.locationnotifier.trackpoints.PointItemListener" />
+        <variable
+            name="switchClickListener"
+            type="me.host43.locationnotifier.trackpoints.PointItemSwitchListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> clickListener.onClick(point)}">
 
         <TextView
             android:id="@+id/altitude_label"
@@ -90,6 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:text="@string/onoff_text"
+            android:onClick="@{() -> switchClickListener.onClick(point)}"
             android:checked="@={point.enabled}"
             app:layout_constraintBottom_toBottomOf="@+id/distance_text_view"
             app:layout_constraintEnd_toEndOf="parent" />
