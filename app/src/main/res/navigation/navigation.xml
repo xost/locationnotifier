@@ -33,5 +33,10 @@
         <action
             android:id="@+id/action_mapFragment_to_trackPointsFragment"
             app:destination="@id/trackPointsFragment" />
+        <argument
+            android:name="point"
+            app:argType="me.host43.locationnotifier.database.Point"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 </navigation>

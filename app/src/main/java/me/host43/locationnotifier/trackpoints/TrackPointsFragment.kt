@@ -46,17 +46,18 @@ class TrackPointsFragment : Fragment() {
         val vmFactory = TrackPointsViewModelFactory(ds, app)
         val vm = ViewModelProvider(this, vmFactory).get(TrackPointsViewModel::class.java)
 
-        //b.lifecycleOwner = this
+        b.lifecycleOwner = this
         b.vm = vm
 
         b.goButton.isChecked = LiveLocationService.isServiceStarted
 
         adapter = PointAdapter(
+            vm,
             PointItemListener {
                 Toast.makeText(context, "Clicked on: ${it}", Toast.LENGTH_LONG).show()
             },
             PointItemSwitchListener {
-                vm.switchPoint(it)
+                //vm.switchPoint(it)
             }
         )
         b.pointList.adapter = adapter
@@ -70,9 +71,18 @@ class TrackPointsFragment : Fragment() {
         vm.eventAddPoint.observe(viewLifecycleOwner, Observer {
             if (it) {
                 this.findNavController().navigate(
-                    TrackPointsFragmentDirections.actionTrackPointsFragmentToMapFragment()
+                    TrackPointsFragmentDirections.actionTrackPointsFragmentToMapFragment(null)
                 )
                 vm.navigationComplete()
+            }
+        })
+
+        vm.point.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                this.findNavController().navigate(
+                    TrackPointsFragmentDirections.actionTrackPointsFragmentToMapFragment(it)
+                )
+                vm.navigateToMapDone()
             }
         })
 

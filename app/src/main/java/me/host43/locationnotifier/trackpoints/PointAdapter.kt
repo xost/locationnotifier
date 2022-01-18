@@ -11,6 +11,7 @@ import me.host43.locationnotifier.databinding.ItemPointLayoutBinding
 import timber.log.Timber
 
 class PointAdapter(
+    private val vm: TrackPointsViewModel,
     private val clickListener: PointItemListener,
     private val switchClickListener: PointItemSwitchListener
 ) :
@@ -19,12 +20,14 @@ class PointAdapter(
         RecyclerView.ViewHolder(b.root) {
         fun bind(
             item: Point,
+            vm: TrackPointsViewModel,
             clickListener: PointItemListener,
             switchClickListener: PointItemSwitchListener
         ) {
             b.point = item
             b.clickListener = clickListener
             b.switchClickListener = switchClickListener
+            b.vm = vm
             b.executePendingBindings()
         }
 
@@ -43,7 +46,7 @@ class PointAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)!!
-        holder.bind(item, clickListener, switchClickListener)
+        holder.bind(item, vm, clickListener, switchClickListener)
     }
 }
 

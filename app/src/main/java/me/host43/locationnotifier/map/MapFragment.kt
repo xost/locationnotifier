@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.model.LatLng
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.databinding.FragmentMapBinding
+import timber.log.Timber
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -37,6 +39,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             container,
             false
         )
+
+        val args = arguments
+        val point = args?.getSerializable("point")
+        if (point!=null) {
+            //set marker and point
+            //set name
+        }
+        Timber.d("Point was passed = ${point}")
 
         val app = requireNotNull(this.activity).application
         val ds = PointDatabase.getInstance(app).dao

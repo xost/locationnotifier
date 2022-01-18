@@ -6,6 +6,9 @@
 
     <data>
         <variable
+            name="vm"
+            type="me.host43.locationnotifier.trackpoints.TrackPointsViewModel"/>
+        <variable
             name="point"
             type="me.host43.locationnotifier.database.Point" />
         <variable
@@ -19,7 +22,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> clickListener.onClick(point)}">
+        android:onClick="@{() -> vm.navigateToMap(point)">
 
         <TextView
             android:id="@+id/altitude_label"
@@ -99,6 +102,7 @@
             android:text="@string/onoff_text"
             android:onClick="@{() -> switchClickListener.onClick(point)}"
             android:checked="@={point.enabled}"
+            android:onCheckedChanged="@{() -> vm.updatePoint(point)}"
             app:layout_constraintBottom_toBottomOf="@+id/distance_text_view"
             app:layout_constraintEnd_toEndOf="parent" />
 
