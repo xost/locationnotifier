@@ -81,9 +81,10 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
         }
     }
 
-    fun navigateToMap(p: Point){
-        Timber.d("the point is: ${p}")
-        _point.value = p
+    fun navigateToMap(id: Long){
+        viewModelScope.launch {
+            _point.value = db.get(id)
+        }
     }
 
     fun navigateToMapDone(){

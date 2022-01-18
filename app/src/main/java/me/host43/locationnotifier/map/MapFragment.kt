@@ -19,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import me.host43.locationnotifier.R
+import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.databinding.FragmentMapBinding
 import timber.log.Timber
@@ -28,6 +29,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var b: FragmentMapBinding
     private lateinit var vm: MapViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var point: Point? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,12 +43,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         )
 
         val args = arguments
-        val point = args?.getSerializable("point")
-        if (point!=null) {
-            //set marker and point
-            //set name
-        }
-        Timber.d("Point was passed = ${point}")
+        point = args?.getSerializable("point") as Point?
 
         val app = requireNotNull(this.activity).application
         val ds = PointDatabase.getInstance(app).dao
@@ -90,6 +87,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         b.mapView.onCreate(savedInstanceState)
         b.mapView.onResume()
         b.mapView.getMapAsync(this)
+
+        point?.let {
+            vm.newMarker(LatLng(it.latitude, it.longitude))
+            vm.map.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(it.latitude, it.longitude),
+                    15.0F
+                )
+            )
+            //set marker and point
+            //set name
+            Timber.d("Point was passed = ${it.name}")
+        }
+
 
         return b.root
     }

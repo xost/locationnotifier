@@ -54,7 +54,8 @@ class TrackPointsFragment : Fragment() {
         adapter = PointAdapter(
             vm,
             PointItemListener {
-                Toast.makeText(context, "Clicked on: ${it}", Toast.LENGTH_LONG).show()
+                vm.navigateToMap(it)
+                //Toast.makeText(context, "Clicked on: ${it}", Toast.LENGTH_LONG).show()
             },
             PointItemSwitchListener {
                 //vm.switchPoint(it)
