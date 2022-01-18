@@ -89,15 +89,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         b.mapView.getMapAsync(this)
 
         point?.let {
-            vm.newMarker(LatLng(it.latitude, it.longitude))
-            vm.map.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(it.latitude, it.longitude),
-                    15.0F
-                )
-            )
-            //set marker and point
             //set name
+            b.placeName.setText(it.name)
             Timber.d("Point was passed = ${it.name}")
         }
 
@@ -153,6 +146,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         map.isMyLocationEnabled = true
         fusedLocationClient.lastLocation.addOnSuccessListener {
             val ll = LatLng(it.latitude, it.longitude)
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15.0F))
+        }
+        point?.let{
+            val ll=LatLng(it.latitude,it.longitude)
+            vm.newMarker(ll)
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15.0F))
         }
     }
