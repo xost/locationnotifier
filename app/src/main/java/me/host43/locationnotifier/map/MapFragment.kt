@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -80,7 +82,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         b.cancelButton.setOnClickListener {
             this.findNavController().navigate(
-                MapFragmentDirections.actionMapFragmentToTrackPointsFragment()
+                MapFragmentDirections.actionMapFragmentToTrackPointsFragment(point,method)
             )
         }
 
@@ -89,15 +91,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         b.mapView.getMapAsync(this)
 
         point?.let {
-            //set name
-            b.placeName.setText(it.name)
+            b.placeName.setText(it.name.toString(), TextView.BufferType.EDITABLE)
             Timber.d("Point was passed = ${it.name}")
         }
 
-
         return b.root
     }
-
 
     override fun onMapReady(map: GoogleMap) {
         vm.setMap(map)
@@ -144,13 +143,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun enableMyLocation(map: GoogleMap) {
         map.isMyLocationEnabled = true
-        fusedLocationClient.lastLocation.addOnSuccessListener {
-            val ll = LatLng(it.latitude, it.longitude)
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15.0F))
-        }
-        point?.let{
-            val ll=LatLng(it.latitude,it.longitude)
+        var ll: LatLng
+        point?.let {
+            ll = LatLng(it.latitude, it.longitude)
             vm.newMarker(ll)
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15.0F))
+            b.placeName.setText(it.name)
+        } ?: fusedLocationClient.lastLocation.addOnSuccessListener {
+            ll = LatLng(it.latitude, it.longitude)
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15.0F))
         }
     }

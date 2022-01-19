@@ -27,19 +27,34 @@
 
         <EditText
             android:id="@+id/place_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_margin="8dp"
             android:autofillHints="@string/placename_hint"
             android:hint="@string/placename_hint"
             android:inputType="textPersonName"
             android:minHeight="48dp"
             android:textColorHint="#757575"
             android:text="@={vm.p.name}"
-            app:layout_constraintBottom_toTopOf="@id/add_button"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/ok_button"
+            app:layout_constraintEnd_toStartOf="@id/distance_input"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mapView" />
+
+        <EditText
+            android:id="@+id/distance_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:autofillHints="@string/distance_hint"
+            android:hint="@string/distance_hint"
+            android:inputType="numberDecimal"
+            android:minHeight="48dp"
+            android:textColorHint="#757575"
+            android:text="@={vm.p.distance}"
+            app:layout_constraintBottom_toTopOf="@id/ok_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/place_name"
             app:layout_constraintTop_toBottomOf="@id/mapView" />
 
         <Button
@@ -47,17 +62,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancel_button_text"
-            app:layout_constraintBaseline_toBaselineOf="@id/add_button"
-            app:layout_constraintEnd_toStartOf="@id/add_button"
+            app:layout_constraintBaseline_toBaselineOf="@id/ok_button"
+            app:layout_constraintEnd_toStartOf="@id/ok_button"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
-            android:id="@+id/add_button"
+            android:id="@+id/ok_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:onClickListener="@{() -> vm.onAddButton()}"
-            android:text="@string/add_button_text"
+            android:text="@string/ok_button_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/cancel_button"/>

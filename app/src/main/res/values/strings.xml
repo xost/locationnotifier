@@ -20,5 +20,7 @@
     <string name="add_button_text">Add</string>
     <string name="cancel_button_text">Cancel</string>
     <string name="placename_hint">enter place name here</string>
+    <string name="ok_button_text">ok</string>
+    <string name="distance_hint">enter distance here</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

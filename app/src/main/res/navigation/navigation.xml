@@ -15,6 +15,15 @@
         <action
             android:id="@+id/action_trackPointsFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
+        <argument
+            android:name="point"
+            app:argType="me.host43.locationnotifier.database.Point"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="method"
+            app:argType="string"
+            android:defaultValue='""' />
     </fragment>
     <fragment
         android:id="@+id/inputPointFragment"
