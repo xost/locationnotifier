@@ -6,8 +6,8 @@
 
     <data>
         <variable
-            name="vm"
-            type="me.host43.locationnotifier.map.MapViewModel" />
+            name="point"
+            type="me.host43.locationnotifier.database.Point" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

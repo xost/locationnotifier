@@ -58,11 +58,6 @@ class MapViewModel(private val db: PointDatabaseDao, app: Application) : Android
     }
 
     fun newMarker(ll: LatLng) {
-        marker?.remove()
-        _marker = map.addMarker(MarkerOptions().position(ll).draggable(true))
-        p.latitude=ll.latitude
-        p.longitude=ll.longitude
-        p.distance = 10000.0
     }
 
     fun navigateToTrackPointsDone() {

@@ -20,6 +20,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import me.host43.locationnotifier.R
 import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabase
@@ -29,9 +31,11 @@ import timber.log.Timber
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var b: FragmentMapBinding
-    private lateinit var vm: MapViewModel
+    //private lateinit var vm: MapViewModel
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var point: Point? = null
+    private var marker: Marker? = null
+    private var point = Point()
+    private var method = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,36 +48,46 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             false
         )
 
-        val args = arguments
-        point = args?.getSerializable("point") as Point?
+        arguments?.let {
+            point = it.getSerializable("point") as Point
+            method = it.getString("method").toString()
+        }
 
-        val app = requireNotNull(this.activity).application
-        val ds = PointDatabase.getInstance(app).dao
-        val vmf = MapViewModelFactory(ds, app)
-        vm = ViewModelProvider(this, vmf).get(MapViewModel::class.java)
+        b.point = point
+
+        //val app = requireNotNull(this.activity).application
+        //val ds = PointDatabase.getInstance(app).dao
+        //val vmf = MapViewModelFactory(ds, app)
+        //vm = ViewModelProvider(this, vmf).get(
+        //    MapViewModel::
+        //    class.java
+        //)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         b.lifecycleOwner = this
-        b.vm = vm
+        //b.vm = vm
 
-        vm.navigateToTrackPoints.observe(viewLifecycleOwner, Observer {
+        vm.navigateToTrackPoints.observe(viewLifecycleOwner, Observer
+        {
             if (it) {
                 this.findNavController().navigate(
-                    MapFragmentDirections.actionMapFragmentToTrackPointsFragment()
+                    MapFragmentDirections.actionMapFragmentToTrackPointsFragment(point, "")
                 )
                 vm.navigateToTrackPointsDone()
             }
         })
 
-        vm.placenameIsNotSetNotify.observe(viewLifecycleOwner, Observer {
+        vm.placenameIsNotSetNotify.observe(viewLifecycleOwner, Observer
+        {
             if (it) {
                 Toast.makeText(context, "please set a placename", Toast.LENGTH_SHORT).show()
                 vm.placenameNotSetNotifyDone()
             }
         })
 
-        vm.placeIsNotSetNotify.observe(viewLifecycleOwner, Observer {
+        vm.placeIsNotSetNotify.observe(viewLifecycleOwner, Observer
+        {
             if (it) {
                 Toast.makeText(context, "please set a place", Toast.LENGTH_SHORT).show()
                 vm.placeNotSetNotifyDone()
@@ -82,18 +96,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         b.cancelButton.setOnClickListener {
             this.findNavController().navigate(
-                MapFragmentDirections.actionMapFragmentToTrackPointsFragment(point,method)
+                MapFragmentDirections.actionMapFragmentToTrackPointsFragment(point, "cancel")
             )
         }
 
         b.mapView.onCreate(savedInstanceState)
         b.mapView.onResume()
         b.mapView.getMapAsync(this)
-
-        point?.let {
-            b.placeName.setText(it.name.toString(), TextView.BufferType.EDITABLE)
-            Timber.d("Point was passed = ${it.name}")
-        }
 
         return b.root
     }
@@ -135,8 +144,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setOnMapLongTap(map: GoogleMap) {
-        map.setOnMapLongClickListener { latLng ->
-            vm.newMarker(latLng)
+        map.setOnMapLongClickListener { ll ->
+            marker?.remove()
+            marker = map.addMarker(MarkerOptions().position(ll).draggable(true))
+            point?.let {
+                it.latitude = ll.latitude
+                it.longitude = ll.longitude
+                it.enabled = false
+            }
         }
     }
 

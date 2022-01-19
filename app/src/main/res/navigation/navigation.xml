@@ -22,8 +22,7 @@
             android:defaultValue="@null" />
         <argument
             android:name="method"
-            app:argType="string"
-            android:defaultValue='""' />
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/inputPointFragment"
@@ -47,5 +46,8 @@
             app:argType="me.host43.locationnotifier.database.Point"
             app:nullable="true"
             android:defaultValue="@null" />
+        <argument
+            android:name="method"
+            app:argType="string" />
     </fragment>
 </navigation>
