@@ -100,4 +100,16 @@ class TrackPointsViewModel(private val db: PointDatabaseDao, val app: Applicatio
     fun getAllPoints(): List<Point>? {
         return db.getAllPoints().value
     }
+
+    fun updatedb(point: Point,method: String){
+        Timber.d("method==${method} point name == ${point.name}")
+        when(method){
+            "new" -> viewModelScope.launch {
+                db.insert(point)
+            }
+            "update" -> viewModelScope.launch {
+                db.update(point)
+            }
+        }
+    }
 }

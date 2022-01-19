@@ -31,10 +31,15 @@ import timber.log.Timber
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var b: FragmentMapBinding
-    //private lateinit var vm: MapViewModel
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var marker: Marker? = null
-    private var point = Point()
+    private var point = Point().apply {
+        latitude = 0.0
+        longitude = 0.0
+        distance = 0.0
+        enabled = false
+    }
     private var method = ""
 
     override fun onCreateView(
@@ -55,50 +60,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         b.point = point
 
-        //val app = requireNotNull(this.activity).application
-        //val ds = PointDatabase.getInstance(app).dao
-        //val vmf = MapViewModelFactory(ds, app)
-        //vm = ViewModelProvider(this, vmf).get(
-        //    MapViewModel::
-        //    class.java
-        //)
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         b.lifecycleOwner = this
-        //b.vm = vm
 
-        vm.navigateToTrackPoints.observe(viewLifecycleOwner, Observer
-        {
-            if (it) {
-                this.findNavController().navigate(
-                    MapFragmentDirections.actionMapFragmentToTrackPointsFragment(point, "")
-                )
-                vm.navigateToTrackPointsDone()
-            }
-        })
-
-        vm.placenameIsNotSetNotify.observe(viewLifecycleOwner, Observer
-        {
-            if (it) {
-                Toast.makeText(context, "please set a placename", Toast.LENGTH_SHORT).show()
-                vm.placenameNotSetNotifyDone()
-            }
-        })
-
-        vm.placeIsNotSetNotify.observe(viewLifecycleOwner, Observer
-        {
-            if (it) {
-                Toast.makeText(context, "please set a place", Toast.LENGTH_SHORT).show()
-                vm.placeNotSetNotifyDone()
-            }
-        })
-
-        b.cancelButton.setOnClickListener {
-            this.findNavController().navigate(
-                MapFragmentDirections.actionMapFragmentToTrackPointsFragment(point, "cancel")
-            )
-        }
+        setListeners()
 
         b.mapView.onCreate(savedInstanceState)
         b.mapView.onResume()
@@ -108,7 +74,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(map: GoogleMap) {
-        vm.setMap(map)
         setOnMapLongTap(map)
         enableMyLocation(map)
     }
@@ -143,30 +108,73 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         b.mapView.onLowMemory()
     }
 
-    private fun setOnMapLongTap(map: GoogleMap) {
-        map.setOnMapLongClickListener { ll ->
-            marker?.remove()
-            marker = map.addMarker(MarkerOptions().position(ll).draggable(true))
-            point?.let {
-                it.latitude = ll.latitude
-                it.longitude = ll.longitude
-                it.enabled = false
+    private fun setListeners() {
+        b.cancelButton.setOnClickListener {
+            this.findNavController().navigate(
+                MapFragmentDirections.actionMapFragmentToTrackPointsFragment(
+                    point,
+                    "cancel"
+                )
+            )
+        }
+
+        b.okButton.setOnClickListener {
+            if (b.placeName.text.isEmpty()) {
+                Toast.makeText(context, "please set a placename", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (b.distanceInput.text.isEmpty()) {
+                Toast.makeText(context, "please set a distance", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            marker?.let {
+                point = Point().apply {
+                    latitude = it.position.latitude
+                    longitude = it.position.longitude
+                }
+                this.findNavController().navigate(
+                    MapFragmentDirections.actionMapFragmentToTrackPointsFragment(
+                        point,
+                        method
+                    )
+                )
             }
         }
+    }
+
+    private fun setOnMapLongTap(map: GoogleMap) {
+        map.setOnMapLongClickListener { ll ->
+            newMarker(ll, map)
+        }
+    }
+
+    private fun newMarker(ll: LatLng, map: GoogleMap) {
+        marker?.remove()
+        marker = map.addMarker(MarkerOptions().position(ll).draggable(true))
     }
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation(map: GoogleMap) {
         map.isMyLocationEnabled = true
         var ll: LatLng
-        point?.let {
-            ll = LatLng(it.latitude, it.longitude)
-            vm.newMarker(ll)
+        if (method.equals("new", true)) {
+            fusedLocationClient.lastLocation.addOnSuccessListener {
+                ll = LatLng(it.latitude, it.longitude)
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15.0F))
+            }
+        } else {
+            ll = LatLng(point.latitude, point.longitude)
+            newMarker(ll, map)
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15.0F))
-            b.placeName.setText(it.name)
-        } ?: fusedLocationClient.lastLocation.addOnSuccessListener {
-            ll = LatLng(it.latitude, it.longitude)
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15.0F))
+            b.placeName.setText(point.name)
         }
+    }
+
+    fun onClickCancelButton() {
+
+    }
+
+    fun onClickOkButton() {
+
     }
 }

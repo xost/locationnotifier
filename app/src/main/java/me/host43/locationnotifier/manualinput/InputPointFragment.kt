@@ -39,7 +39,7 @@ class InputPointFragment : Fragment() {
             if (it) {
                 Log.i("##$#", "#####################")
                 this.findNavController().navigate(
-                    InputPointFragmentDirections.actionInputPointFragmentToTrackPointsFragment()
+                    InputPointFragmentDirections.actionInputPointFragmentToTrackPointsFragment(null,"")
                 )
                 vm.navigateToTrackPointsDone()
             }

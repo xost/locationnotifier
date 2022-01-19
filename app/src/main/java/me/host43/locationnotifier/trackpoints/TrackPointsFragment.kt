@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import me.host43.locationnotifier.MainActivity
 import me.host43.locationnotifier.livelocation.LiveLocationService
 import me.host43.locationnotifier.R
+import me.host43.locationnotifier.database.Point
 import me.host43.locationnotifier.database.PointDatabase
 import me.host43.locationnotifier.databinding.FragmentTrackPointsBinding
 import me.host43.locationnotifier.locationreceiver.LocationBroadcastReceiver
@@ -41,10 +42,22 @@ class TrackPointsFragment : Fragment() {
             false
         )
 
+        var point:Point? = null
+        var method = ""
+
         app = requireNotNull(this.activity).application
         val ds = PointDatabase.getInstance(app).dao
         val vmFactory = TrackPointsViewModelFactory(ds, app)
         val vm = ViewModelProvider(this, vmFactory).get(TrackPointsViewModel::class.java)
+
+        arguments?.let {
+            point = it.getSerializable("point") as Point?
+            method = it.getString("method").toString()
+        }
+
+        point?.let {
+            if (method.isNotEmpty()) vm.updatedb(it, method)
+        }
 
         b.lifecycleOwner = this
         b.vm = vm
@@ -72,7 +85,10 @@ class TrackPointsFragment : Fragment() {
         vm.eventAddPoint.observe(viewLifecycleOwner, Observer {
             if (it) {
                 this.findNavController().navigate(
-                    TrackPointsFragmentDirections.actionTrackPointsFragmentToMapFragment(null)
+                    TrackPointsFragmentDirections.actionTrackPointsFragmentToMapFragment(
+                        Point(),
+                        "new"
+                    )
                 )
                 vm.navigationComplete()
             }
@@ -81,7 +97,10 @@ class TrackPointsFragment : Fragment() {
         vm.point.observe(viewLifecycleOwner, Observer {
             it?.let {
                 this.findNavController().navigate(
-                    TrackPointsFragmentDirections.actionTrackPointsFragmentToMapFragment(it)
+                    TrackPointsFragmentDirections.actionTrackPointsFragmentToMapFragment(
+                        it,
+                        "update"
+                    )
                 )
                 vm.navigateToMapDone()
             }

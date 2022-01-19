@@ -48,6 +48,7 @@
             android:defaultValue="@null" />
         <argument
             android:name="method"
-            app:argType="string" />
+            app:argType="string"
+            android:defaultValue='""' />
     </fragment>
 </navigation>

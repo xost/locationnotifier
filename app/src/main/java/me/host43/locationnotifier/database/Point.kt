@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey
 import java.io.Serializable
 
 @Entity(tableName = "points_table")
-class Point: Serializable {
+class Point : Serializable {
     @PrimaryKey(autoGenerate = true)
     var pointId: Long = 0L
 
@@ -58,7 +58,7 @@ class Point: Serializable {
         @InverseBindingAdapter(attribute = "android:text")
         @JvmStatic
         fun getDouble(v: EditText): Double {
-            return v.text.toString().toDouble()
+            return if (v.text.isEmpty()) 0.0 else v.text.toString().toDouble()
         }
     }
 }
