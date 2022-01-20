@@ -128,7 +128,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 return@setOnClickListener
             }
             marker?.let {
-                point = Point().apply {
+                point.apply {
                     latitude = it.position.latitude
                     longitude = it.position.longitude
                 }

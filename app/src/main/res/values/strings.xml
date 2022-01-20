@@ -1,21 +1,13 @@
 <resources>
     <string name="app_name">LocationNotifier</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="altitude_label_text">Altitude:</string>
     <string name="latitude_label_text">Latitude:</string>
     <string name="distance_label_text">Distance:</string>
-    <string name="altitude_text">altitude</string>
-    <string name="latitude_text">latitude</string>
-    <string name="distance_text">distance</string>
-    <string name="name_text">name</string>
     <string name="current_location_text">current location</string>
-    <string name="go_button_text">GO !</string>
     <string name="onoff_text">on/off</string>
     <string name="name_label_text">Name:</string>
-    <string name="addPointHint">add point</string>
     <string name="add_point_hint">add poont</string>
-    <string name="clean_button">Clean all</string>
     <string name="clear_button">remove all</string>
     <string name="add_button_text">Add</string>
     <string name="cancel_button_text">Cancel</string>
