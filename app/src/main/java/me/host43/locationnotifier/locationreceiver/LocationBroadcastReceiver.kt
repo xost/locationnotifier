@@ -74,7 +74,7 @@ class LocationBroadcastReceiver : BroadcastReceiver() {
 
     private fun createNotification(ctx: Context, channelId: String, message: String): Notification {
         val intent = Intent(ctx, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(ctx, 0, intent, 0)
+        val pendingIntent = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         val notificationBuilder = NotificationCompat.Builder(ctx, channelId).apply {
             setContentTitle("${R.string.app_name} - ${Companion.CONTENT_TITLE_TEXT}")
             setTicker("${R.string.app_name} - ${Companion.CONTENT_TITLE_TEXT}")
@@ -85,7 +85,8 @@ class LocationBroadcastReceiver : BroadcastReceiver() {
             setWhen(0)
             setOnlyAlertOnce(true)
             setContentIntent(pendingIntent)
-            priority = NotificationCompat.PRIORITY_LOW
+            setFullScreenIntent(pendingIntent,true)
+            priority = NotificationCompat.PRIORITY_MAX
         }
         return notificationBuilder.build()
     }
